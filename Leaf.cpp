@@ -2,6 +2,7 @@
 
 #include "Leaf.h"
 using components::Leaf;
+using components::Component;
 
 #include <iostream>
 using std::cout;
@@ -11,10 +12,10 @@ Leaf::Leaf()
 
 }
 
-Leaf::Leaf(const char *name, const char * value)
+components::Leaf::Leaf(const char * name, Component * value)
 {
-    strcpy_s(this->name, sizeof(this->name), name);
-    strcpy_s(this->value, sizeof(this->value), value);
+	strcpy_s(this->name, sizeof(this->name), name);
+	this->value = value;
 }
 
 Leaf::~Leaf()
@@ -24,6 +25,17 @@ Leaf::~Leaf()
 
 void Leaf::print() const
 {
-    cout << name << ':' << value;
+    cout << name << ':';
+	this->value->print();
+}
+
+const Component * components::Leaf::getValue() const
+{
+	return this->value;
+}
+
+const char * components::Leaf::getName() const
+{
+	return this->name;
 }
 

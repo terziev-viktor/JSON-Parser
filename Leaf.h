@@ -10,11 +10,14 @@ namespace components
     {
     public:
     	Leaf();
-    	Leaf(const char * name, const char * value);
+    	Leaf(const char * name, Component * value);
     	~Leaf();
     	void print() const;
+		const Component * getValue() const;
+		const char * getName() const;
+
     private:
     	char name[100];
-    	char value[100];
+		Component * value;
     };
 }

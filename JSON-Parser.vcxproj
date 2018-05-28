@@ -104,12 +104,16 @@
     <ClCompile Include="Composite.cpp" />
     <ClCompile Include="Leaf.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Number.cpp" />
+    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Composite.h" />
     <ClInclude Include="Leaf.h" />
+    <ClInclude Include="Number.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="tools\DynamicArray.hpp" />
     <ClInclude Include="tools\List.hpp" />
   </ItemGroup>

@@ -20,7 +20,7 @@ void Composite::print() const
 
     for (size_t i = 0; i < this->children.count(); ++i)
     {
-        cout << "\t";
+        cout << '\t';
         children.getAt(i)->print();
         cout << endl;
     }

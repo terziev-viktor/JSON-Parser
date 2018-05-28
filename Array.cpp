@@ -12,12 +12,12 @@ components::Array::~Array()
 {
 }
 
-const char * components::Array::get(int at) const
+const components::Component * components::Array::get(int at) const
 {
 	return this->values.getAt(at);
 }
 
-void components::Array::add(const char * value)
+void components::Array::add(components::Component * value)
 {
 	this->values.add(value);
 }
@@ -33,9 +33,11 @@ void components::Array::print() const
 	cout << '[';
 	for (unsigned int i = 0; i < this->values.count() - 1; i++)
 	{
-		cout << this->values.getAt(i) << ", ";
+		this->values.getAt(i)->print();
+		cout << ", ";
 	}
-	cout << this->values.getAt(this->values.count() - 1) << ']';
+	this->values.getAt(this->values.count() - 1)->print();
+	cout << ']';
 }
 
 

@@ -12,12 +12,12 @@ namespace components
 		Array();
 		~Array();
 
-		const char * get(int at) const;
-		void add(const char * value);
+		const Component * get(int at) const;
+		void add(Component * value);
 		const unsigned int size() const;
 
 		void print() const;
 	private:
-		List<const char> values;
+		List<Component> values;
 	};
 }

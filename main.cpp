@@ -3,6 +3,8 @@
 #include "Composite.h"
 #include "Leaf.h"
 #include "Array.h"
+#include "String.h"
+#include "Number.h"
 
 #include <iostream>
 #include <vector>
@@ -22,15 +24,17 @@ using namespace components;
 int main()
 {
     Composite json;
-    json.addChild(new Leaf("name1", "val"));
-    json.addChild(new Leaf("name2", "val"));
-    json.addChild(new Leaf("name3", "val"));
-    json.addChild(new Composite());
+    json.addChild(new Leaf("name1", new String("value1")));
+    json.addChild(new Leaf("name2", new String("value2")));
+	json.addChild(new Leaf("name3", new Number(222.222)));
 	Array * arr = new Array();
-	arr->add(new char[6] {"first"});
-	arr->add(new char[7] {"second"});
-	arr->add(new char[6] {"third"});
-	json.addChild(arr);
-    json.print();
+	arr->add(new String("first"));
+	arr->add(new String("Second"));
+	arr->add(new Number(7.77));
+	Composite * composite = new Composite();
+	composite->addChild(new Leaf("arr", arr));
+	json.addChild(new Leaf("anotherObject", composite));
+	json.print();
+
 	return 0;
 }
