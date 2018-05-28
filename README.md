@@ -8,5 +8,9 @@ Coming soon - the following functionality:
 2. Reading from a file  
    The program reads a json from a .txt or .json file.
 
-## The JSON class
-All methods and functionallity will be documented.
+## The OOP Design
+The OOP Design I'm using is Composite.
+* The intent of this pattern is to compose objects into tree structures to represent part-whole hierarchies
+* Composite lets clients treat individual objects and compositions of objects uniformly.  
+
+Composite design pattern in details @ https://www.oodesign.com/composite-pattern.html
