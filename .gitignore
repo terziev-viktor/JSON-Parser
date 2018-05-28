@@ -287,8 +287,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-# Custom
-*.sln
-*.vcxproj
-*.vcxproj.filters
 
