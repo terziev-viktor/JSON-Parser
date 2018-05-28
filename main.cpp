@@ -2,6 +2,7 @@
 #include "tools/List.hpp"
 #include "Composite.h"
 #include "Leaf.h"
+#include "Array.h"
 
 #include <iostream>
 #include <vector>
@@ -25,6 +26,11 @@ int main()
     json.addChild(new Leaf("name2", "val"));
     json.addChild(new Leaf("name3", "val"));
     json.addChild(new Composite());
+	Array * arr = new Array();
+	arr->add(new char[6] {"first"});
+	arr->add(new char[7] {"second"});
+	arr->add(new char[6] {"third"});
+	json.addChild(arr);
     json.print();
 	return 0;
 }

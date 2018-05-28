@@ -102,7 +102,7 @@ namespace tools
 	template<class T>
 	inline void List<T>::clear()
 	{
-		for (int i = 0; i < this->index; i++)
+		for (unsigned int i = 0; i < this->index; i++)
 		{
 			delete this->buffer[i];
 		}
