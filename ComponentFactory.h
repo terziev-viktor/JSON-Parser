@@ -10,7 +10,6 @@ namespace factory
 	public:
 		static ComponentFactory & getFactory();
 		void registerCreator(const ComponentCreator * creator);
-		Component * createByOpenTag(const char openTag, std::ifstream & in);
 		Component * create(const char * what, std::ifstream & in);
 
 	private:

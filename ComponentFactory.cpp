@@ -15,18 +15,6 @@ void factory::ComponentFactory::registerCreator(const ComponentCreator * creator
 	}
 }
 
-Component * factory::ComponentFactory::createByOpenTag(const char openTag, std::ifstream & in)
-{
-	for (int i = 0; i < index; i++)
-	{
-		if (creators[i]->getOpenTag() == openTag)
-		{
-			return creators[i]->createComponent(in);
-		}
-	}
-	return nullptr;
-}
-
 Component * factory::ComponentFactory::create(const char * what, std::ifstream & in)
 {
 	for (int i = 0; i < index; i++)

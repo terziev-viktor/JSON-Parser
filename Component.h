@@ -15,16 +15,12 @@ namespace components
 	class ComponentCreator
 	{
 	public:
-		ComponentCreator(char openTag, char closeTag, const char * name);
+		ComponentCreator(const char * name);
 		virtual ~ComponentCreator();
 
 		virtual Component * createComponent(std::ifstream & in) const = 0;
-		const char getOpenTag() const;
-		const char getClosingTag() const;
 		const char * getName() const;
 	protected:
-		char openTag;
-		char closeTag;
 		static const int MAX_NAME_LEN = 100;
 		char name[MAX_NAME_LEN];
 	};

@@ -51,12 +51,11 @@ void components::Array::print() const
 }
 
 components::ArrayCreator::ArrayCreator()
-	:ComponentCreator('[', ']', "array")
+	:ComponentCreator("array")
 {
 }
 
 components::Component * components::ArrayCreator::createComponent(std::ifstream & out) const
 {
-	// TODO
 	return new Array();
 }

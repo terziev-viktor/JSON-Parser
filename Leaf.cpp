@@ -46,12 +46,11 @@ const char * components::Leaf::getName() const
 }
 
 components::LeafCreator::LeafCreator()
-	:ComponentCreator('"', ',', "leaf")
+	:ComponentCreator("leaf")
 {
 }
 
 Component * components::LeafCreator::createComponent(std::ifstream & in) const
 {
-	// todo
 	return new Leaf("leaf", new Number(2.22));
 }

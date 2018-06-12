@@ -92,11 +92,11 @@ void components::Number::print(std::ostream & out) const
 }
 
 components::NumberCreator::NumberCreator()
-	:ComponentCreator('\0', ',', "number")
+	:ComponentCreator("number")
 {
 }
 
 components::Component * components::NumberCreator::createComponent(std::ifstream & in) const
-{
-	return new Number(3.14);
+{	
+	return new Number();
 }

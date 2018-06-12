@@ -1,6 +1,8 @@
 #include "String.h"
 #include <string.h>
 #include <iostream>
+#include <fstream>
+
 using std::cout;
 
 components::String::String()
@@ -97,7 +99,7 @@ components::String & components::String::operator+=(const String & other)
 		newValue[index] = this->value[i];
 		index++;
 	}
-	
+
 	for (size_t i = 0; i < otherLen; i++)
 	{
 		newValue[index] = other.value[i];
@@ -111,11 +113,11 @@ components::String & components::String::operator+=(const String & other)
 }
 
 components::StringCreator::StringCreator()
-	:ComponentCreator('"', '"', "string")
+	:ComponentCreator("string")
 {
 }
 
 components::Component * components::StringCreator::createComponent(std::ifstream & in) const
 {
-	return new String("some new string");
+	return new String();
 }

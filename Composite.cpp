@@ -44,7 +44,7 @@ void Composite::addChild(Component * child)
 }
 
 components::CompositeCreator::CompositeCreator()
-	:ComponentCreator('{', '}', "composite")
+	:ComponentCreator("composite")
 {
 }
 

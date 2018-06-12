@@ -25,16 +25,5 @@ using namespace factory;
 
 int main()
 {
-    Composite json;
-	std::ifstream in;
-    json.addChild(ComponentFactory::getFactory().create("number", in));
-    json.addChild(ComponentFactory::getFactory().create("string", in));
-	json.addChild(ComponentFactory::getFactory().create("leaf", in));
-	json.addChild(ComponentFactory::getFactory().create("composite", in));
-	json.addChild(ComponentFactory::getFactory().create("array", in));
-	json.print(cout);
-
-	
-	
 	return 0;
 }
