@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Leaf.h"
+#include "Number.h"
 using components::Leaf;
 using components::Component;
 
@@ -25,8 +26,13 @@ Leaf::~Leaf()
 
 void Leaf::print() const
 {
-    cout << name << ':';
-	this->value->print();
+	print(cout);
+}
+
+void components::Leaf::print(std::ostream & out) const
+{
+	out << name << ':';
+	this->value->print(out);
 }
 
 const Component * components::Leaf::getValue() const
@@ -39,3 +45,13 @@ const char * components::Leaf::getName() const
 	return this->name;
 }
 
+components::LeafCreator::LeafCreator()
+	:ComponentCreator('"', ',', "leaf")
+{
+}
+
+Component * components::LeafCreator::createComponent(std::ifstream & in) const
+{
+	// todo
+	return new Leaf("leaf", new Number(2.22));
+}

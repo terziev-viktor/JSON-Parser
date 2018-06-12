@@ -56,7 +56,12 @@ void components::String::setValue(const char * value)
 
 void components::String::print() const
 {
-	cout << this->value;
+	print(cout);
+}
+
+void components::String::print(std::ostream & out) const
+{
+	out << this->value;
 }
 
 bool components::String::operator==(const String & other) const
@@ -103,4 +108,14 @@ components::String & components::String::operator+=(const String & other)
 	delete[] this->value;
 	this->value = newValue;
 	return *this;
+}
+
+components::StringCreator::StringCreator()
+	:ComponentCreator('"', '"', "string")
+{
+}
+
+components::Component * components::StringCreator::createComponent(std::ifstream & in) const
+{
+	return new String("some new string");
 }

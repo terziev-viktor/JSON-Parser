@@ -28,16 +28,35 @@ const unsigned int components::Array::size() const
 }
 
 // override
+
+void components::Array::print(std::ostream & out) const
+{
+	out << '[';
+	if (this->values.count() > 0)
+	{
+		for (size_t i = 0; i < this->values.count() - 1; i++)
+		{
+			this->values.getAt(i)->print();
+			out << ", ";
+		}
+
+		this->values.getAt(this->values.count() - 1)->print();
+	}
+
+	out << ']';
+}
 void components::Array::print() const
 {
-	cout << '[';
-	for (unsigned int i = 0; i < this->values.count() - 1; i++)
-	{
-		this->values.getAt(i)->print();
-		cout << ", ";
-	}
-	this->values.getAt(this->values.count() - 1)->print();
-	cout << ']';
+	this->print(cout);
 }
 
+components::ArrayCreator::ArrayCreator()
+	:ComponentCreator('[', ']', "array")
+{
+}
 
+components::Component * components::ArrayCreator::createComponent(std::ifstream & out) const
+{
+	// TODO
+	return new Array();
+}

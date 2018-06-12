@@ -16,16 +16,21 @@ Composite::~Composite()
 
 void Composite::print() const
 {
-    cout << "{\n";
+	print(cout);
+}
 
-    for (size_t i = 0; i < this->children.count(); ++i)
-    {
-        cout << '\t';
-        children.getAt(i)->print();
-        cout << endl;
-    }
+void components::Composite::print(std::ostream & out) const
+{
+	out << "{\n";
 
-    cout << "}\n";
+	for (size_t i = 0; i < this->children.count(); ++i)
+	{
+		out << '\t';
+		children.getAt(i)->print(out);
+		out << endl;
+	}
+
+	out << "}\n";
 }
 
 const Component * Composite::getChild(int at) const
@@ -36,4 +41,14 @@ const Component * Composite::getChild(int at) const
 void Composite::addChild(Component * child)
 {
     this->children.add(child);
+}
+
+components::CompositeCreator::CompositeCreator()
+	:ComponentCreator('{', '}', "composite")
+{
+}
+
+Component * components::CompositeCreator::createComponent(std::ifstream & in) const
+{
+	return new Composite();
 }

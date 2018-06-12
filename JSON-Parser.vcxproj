@@ -101,7 +101,11 @@
   <ItemGroup>
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="Composite.cpp" />
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="Expression.cpp" />
+    <ClCompile Include="JSONParser.cpp" />
     <ClCompile Include="Leaf.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Number.cpp" />
@@ -110,7 +114,11 @@
   <ItemGroup>
     <ClInclude Include="Array.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="Composite.h" />
+    <ClInclude Include="Context.h" />
+    <ClInclude Include="Expression.h" />
+    <ClInclude Include="JSONParser.h" />
     <ClInclude Include="Leaf.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="String.h" />

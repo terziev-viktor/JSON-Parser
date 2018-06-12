@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-
+//using factory::ComponentCreator;
 namespace components
 {
 	class String : public Component
@@ -15,14 +15,24 @@ namespace components
 
 		const char charAt(int at) const;
 		void setValue(const char * value);
-
+		
 		// override virtual function
 		void print() const;
+		void print(std::ostream & out) const;
 
 		// Operators
-		bool String::operator==(const String & other) const;
-		String & String::operator+=(const String & other);
+		bool operator==(const String & other) const;
+		String & operator+=(const String & other);
 	private:
 		char * value;
 	};
+	
+	class StringCreator : public ComponentCreator
+	{
+	public:
+		StringCreator();
+		Component * createComponent(std::ifstream & in) const;
+	};
+
+	static StringCreator theStringCreator;
 }

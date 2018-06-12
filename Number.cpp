@@ -83,5 +83,20 @@ Number & components::Number::operator/=(const Number & other)
 
 void components::Number::print() const
 {
-	cout << value;
+	print(cout);
+}
+
+void components::Number::print(std::ostream & out) const
+{
+	out << value;
+}
+
+components::NumberCreator::NumberCreator()
+	:ComponentCreator('\0', ',', "number")
+{
+}
+
+components::Component * components::NumberCreator::createComponent(std::ifstream & in) const
+{
+	return new Number(3.14);
 }

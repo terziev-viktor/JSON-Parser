@@ -21,7 +21,8 @@ namespace tools
 		void add(T * item);
 		// returns the item on <index> place. Throws out_of_range exception for invalid index
 		// I dont return a const item because Fmibook should be able to edit items;
-		T * getAt(unsigned int index) const;
+		const T * getAt(unsigned int index) const;
+		T * getAt(unsigned int index);
 		void removeAt(unsigned int index);
 		const bool isEmpty() const;
 		// sets the index to 0. Does not delete objects
@@ -68,7 +69,17 @@ namespace tools
 	}
 	
 	template<class T>
-	inline T * List<T>::getAt(unsigned int index) const
+	inline const T * List<T>::getAt(unsigned int index) const
+	{
+		if (index >= this->index || index < 0)
+		{
+			throw std::out_of_range("Index out of range.");
+		}
+		return this->buffer[index];
+	}
+
+	template<class T>
+	inline T * List<T>::getAt(unsigned int index)
 	{
 		if (index >= this->index || index < 0)
 		{
