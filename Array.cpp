@@ -1,7 +1,9 @@
 #include "Array.h"
 #include <iostream>
+#include <fstream>
 #include <stdarg.h>
 using std::cout;
+#include "String.h"
 
 components::Array::Array()
 {
@@ -25,6 +27,16 @@ void components::Array::add(components::Component * value)
 const unsigned int components::Array::size() const
 {
 	return this->values.count();
+}
+
+components::Component * components::Array::operator[](int index)
+{
+	return this->values.getAt(index);
+}
+
+const components::Component * components::Array::operator[](int index) const
+{
+	return this->values.getAt(index);
 }
 
 // override
@@ -55,7 +67,7 @@ components::ArrayCreator::ArrayCreator()
 {
 }
 
-components::Component * components::ArrayCreator::createComponent(std::ifstream & out) const
+components::Component * components::ArrayCreator::createComponent(std::ifstream & in) const
 {
 	return new Array();
 }

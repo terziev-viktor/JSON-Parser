@@ -23,24 +23,73 @@ void components::Composite::print(std::ostream & out) const
 {
 	out << "{\n";
 
-	for (size_t i = 0; i < this->children.count(); ++i)
+	for (size_t i = 0; i < this->leafs.count(); ++i)
 	{
 		out << '\t';
-		children.getAt(i)->print(out);
+		leafs.getAt(i)->print(out);
 		out << endl;
 	}
 
 	out << "}\n";
 }
 
-const Component * Composite::getChild(int at) const
+const Leaf * Composite::getLeaf(int at) const
 {
-    return this->children.getAt(at);
+    return this->leafs.getAt(at);
 }
 
-void Composite::addChild(Component * child)
+Leaf * components::Composite::getLeaf(int n)
 {
-    this->children.add(child);
+	return this->leafs.getAt(n);
+}
+
+const Leaf * components::Composite::getLeaf(const char * name) const
+{
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(name, this->leafs.getAt(i)->getName()) == 0)
+		{
+			return this->leafs.getAt(i);
+		}
+	}
+	throw "Invalid name";
+}
+
+Leaf * components::Composite::getLeaf(const char * name)
+{
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(name, this->leafs.getAt(i)->getName()) == 0)
+		{
+			return this->leafs.getAt(i);
+		}
+	}
+	throw "Invalid name";
+}
+
+void Composite::addLeaf(Leaf * child)
+{
+    this->leafs.add(child);
+}
+
+const Leaf * components::Composite::operator[](int n) const
+{
+	return this->getLeaf(n);
+}
+
+Leaf * components::Composite::operator[](int n)
+{
+	return this->getLeaf(n);
+}
+
+const Leaf * components::Composite::operator[](const char * name) const
+{
+	return this->getLeaf(name);
+}
+
+Leaf * components::Composite::operator[](const char * name)
+{
+	return this->getLeaf(name);
 }
 
 components::CompositeCreator::CompositeCreator()

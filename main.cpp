@@ -1,12 +1,7 @@
-#include "tools/List.hpp"
-#include "Composite.h"
-#include "Leaf.h"
-#include "Array.h"
-#include "String.h"
-#include "Number.h"
-
+#include "JSONParser.h"
 #include "ComponentFactory.h"
-
+#include "Composite.h"
+#include "Number.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -18,6 +13,7 @@ using std::vector;
 using namespace tools;
 using namespace components;
 using namespace factory;
+using namespace interpreters;
 
 // This is a .NET solution
 // I'm using the Composite OOP Design Pattern
@@ -25,5 +21,9 @@ using namespace factory;
 
 int main()
 {
+	Composite json;
+	json.addLeaf(new Leaf("one", new Number(4.13)));
+	json["one"]->print();
+
 	return 0;
 }

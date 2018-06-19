@@ -1,10 +1,13 @@
 #include "JSONParser.h"
+#include <fstream>
+#include "String.h"
+
+using std::ifstream;
 using namespace interpreters;
 
-JSONParser::JSONParser(const char * path)
+JSONParser::JSONParser()
 {
 	this->list = new List<Component>();
-	this->load(path);
 }
 
 JSONParser::JSONParser(DynamicArray<Component>* list, const char * path)
@@ -36,7 +39,42 @@ void JSONParser::print() const
 	}
 }
 
-void JSONParser::load(const char * path)
+const String & interpreters::JSONParser::getFile() const
 {
-	cout << "loading" << endl;
+	return this->file;
+}
+
+bool JSONParser::load(const char * path)
+{
+	ifstream in;
+	char buffer[1025];
+	in.open(path);
+	if (!in)
+	{
+		in.close();
+		return false;
+	}
+	while (in)
+	{
+		in.getline(buffer, 1024);
+		if (in.gcount() > 0)
+		{
+			buffer[in.gcount() - 1] = '\n';
+			buffer[in.gcount()] = '\0';
+			this->file += buffer;
+		}
+	}
+	return true;
+}
+
+bool contains(const char * str, int size, const char tocken)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (str[i] == tocken)
+		{
+			return true;
+		}
+	}
+	return false;
 }

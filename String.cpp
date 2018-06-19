@@ -7,6 +7,8 @@ using std::cout;
 
 components::String::String()
 {
+	this->value = new char[1];
+	this->value[0] = '\0';
 }
 
 components::String::String(const char * value)
@@ -54,6 +56,11 @@ void components::String::setValue(const char * value)
 	{
 		this->value[i] = value[i];
 	}
+}
+
+bool components::String::startsWith(const char ch)
+{
+	return this->value[0] == ch;
 }
 
 void components::String::print() const
@@ -112,6 +119,41 @@ components::String & components::String::operator+=(const String & other)
 	return *this;
 }
 
+components::String & components::String::operator+=(const char * other)
+{
+	const size_t thisLen = this->getLen();
+	const size_t otherLen = strlen(other);
+
+	char * newValue = new char[thisLen + otherLen + 1];
+	size_t index = 0;
+	for (size_t i = 0; i < thisLen; i++)
+	{
+		newValue[index] = this->value[i];
+		index++;
+	}
+
+	for (size_t i = 0; i < otherLen; i++)
+	{
+		newValue[index] = other[i];
+		index++;
+	}
+	newValue[index] = '\0';
+
+	delete[] this->value;
+	this->value = newValue;
+	return *this;
+}
+
+const char components::String::operator[](int index) const
+{
+	return this->value[index];
+}
+
+char& components::String::operator[](int index)
+{
+	return this->value[index];
+}
+
 components::StringCreator::StringCreator()
 	:ComponentCreator("string")
 {
@@ -119,5 +161,11 @@ components::StringCreator::StringCreator()
 
 components::Component * components::StringCreator::createComponent(std::ifstream & in) const
 {
-	return new String();
+	return new components::String();
+}
+
+std::ostream & components::operator<<(std::ostream & os, const String & obj)
+{
+	os << obj.getValue();
+	return os;
 }

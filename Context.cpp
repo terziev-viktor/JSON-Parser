@@ -23,7 +23,7 @@ Context::~Context()
 	}
 	if (this->output)
 	{
-		delete[] this->output;
+		delete this->output;
 	}
 }
 

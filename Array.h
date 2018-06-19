@@ -16,6 +16,8 @@ namespace components
 		const Component * get(int at) const;
 		void add(Component * value);
 		const unsigned int size() const;
+		Component * operator[](int index);
+		const Component * operator[](int index) const;
 
 		void print() const;
 		void print(std::ostream & out) const;
