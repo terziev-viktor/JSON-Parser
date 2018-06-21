@@ -45,12 +45,3 @@ const char * components::Leaf::getName() const
 	return this->name;
 }
 
-components::LeafCreator::LeafCreator()
-	:ComponentCreator("leaf")
-{
-}
-
-Component * components::LeafCreator::createComponent(std::ifstream & in) const
-{
-	return new Leaf("leaf", new Number(2.22));
-}

@@ -2,6 +2,7 @@
 #include "ComponentFactory.h"
 #include "Composite.h"
 #include "Number.h"
+#include "Tokenizer.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -21,9 +22,8 @@ using namespace interpreters;
 
 int main()
 {
-	Composite json;
-	json.addLeaf(new Leaf("one", new Number(4.13)));
-	json["one"]->print();
-
+	String json("{ \"key1\":\"value1\"	\n }");
+	Stack<Token> tokens = Tokenizer::tokenize(json);
+	cout << tokens << endl;
 	return 0;
 }

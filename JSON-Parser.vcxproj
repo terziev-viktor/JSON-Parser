@@ -110,6 +110,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Number.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="Tokenizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
@@ -121,9 +122,12 @@
     <ClInclude Include="JSONParser.h" />
     <ClInclude Include="Leaf.h" />
     <ClInclude Include="Number.h" />
+    <ClInclude Include="Stack.hpp" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="Tokenizer.h" />
     <ClInclude Include="tools\DynamicArray.hpp" />
     <ClInclude Include="tools\List.hpp" />
+    <ClInclude Include="Vector.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

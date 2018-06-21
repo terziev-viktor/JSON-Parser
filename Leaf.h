@@ -23,14 +23,4 @@ namespace components
     	char name[100];
 		Component * value;
     };
-
-	class LeafCreator : public ComponentCreator
-	{
-	public:
-		LeafCreator();
-
-		Component * createComponent(std::ifstream & in) const;
-	};
-
-	static LeafCreator theLeafCreator;
 }

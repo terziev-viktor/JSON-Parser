@@ -4,18 +4,38 @@
 #include <fstream>
 
 using std::cout;
-
+using std::endl;
 components::String::String()
 {
-	this->value = new char[1];
+	this->value = nullptr;
+}
+
+components::String::String(size_t capacity)
+{
+	this->capacity = capacity + 1;
+	this->length = 0;
+	this->value = new char[this->capacity];
 	this->value[0] = '\0';
+}
+
+components::String::String(const String & other)
+{
+	this->length = other.getLen();
+	this->capacity = this->length + 1;
+	this->value = new char[this->capacity];
+	for (size_t i = 0; i < this->length; i++)
+	{
+		this->value[i] = other[i];
+	}
+	this->value[this->length] = '\0';
 }
 
 components::String::String(const char * value)
 {
-	size_t len = strlen(value);
-	this->value = new char[len + 1];
-	for (size_t i = 0; i <= len; i++)
+	this->length = strlen(value);
+	this->capacity = this->length + 1;
+	this->value = new char[this->capacity];
+	for (size_t i = 0; i <= this->length; i++)
 	{
 		this->value[i] = value[i];
 	}
@@ -24,7 +44,7 @@ components::String::String(const char * value)
 
 components::String::~String()
 {
-	if (value)
+	if (this->value)
 	{
 		delete[] this->value;
 	}
@@ -37,11 +57,58 @@ const char * components::String::getValue() const
 
 const size_t components::String::getLen() const
 {
-	return strlen(this->value);
+	return this->length;
 }
 
-const char components::String::charAt(int at) const
+components::String components::String::substring(size_t from, size_t to) const
 {
+	if (to < from)
+	{
+		throw std::logic_error("to cannot be before from");
+	}
+	size_t capacity = to - from;
+	String result(capacity);
+	for (size_t i = from; i < to; i++)
+	{
+		result += this->charAt(i);
+	}
+	return result;
+}
+
+const int components::String::firstIndexOf(const char c, size_t start_from) const
+{
+	for (int i = start_from; i < this->length; ++i)
+	{
+		if (this->value[i] == c)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+const int components::String::firstIndexOf(const char * c, size_t start_from) const
+{
+	size_t len = strlen(c);
+	for (int i = start_from; i < this->length; ++i)
+	{
+		for (size_t j = 0; j < len; ++j)
+		{
+			if (c[j] == this->value[i])
+			{
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
+const char components::String::charAt(unsigned int at) const
+{
+	if (at < 0 || at >= this->length)
+	{
+		throw std::out_of_range("Index out of range");
+	}
 	return this->value[at];
 }
 
@@ -51,14 +118,29 @@ void components::String::setValue(const char * value)
 	{
 		delete[] this->value;
 	}
-	size_t len = strlen(value);
-	for (size_t i = 0; i < len; i++)
+	this->length = strlen(value);
+	this->capacity = this->length + 1;
+	this->value = new char[this->capacity];
+	for (size_t i = 0; i <= this->length; i++)
 	{
 		this->value[i] = value[i];
 	}
 }
 
-bool components::String::startsWith(const char ch)
+void components::String::setValue(const char c)
+{
+	if (this->value)
+	{
+		delete[] this->value;
+	}
+	this->value = new char[2];
+	this->length = 1;
+	this->capacity = 2;
+	this->value[0] = c;
+	this->value[1] = '\0';
+}
+
+const bool components::String::startsWith(const char ch) const
 {
 	return this->value[0] == ch;
 }
@@ -71,6 +153,24 @@ void components::String::print() const
 void components::String::print(std::ostream & out) const
 {
 	out << this->value;
+}
+
+components::String & components::String::operator=(const char * other)
+{
+	this->setValue(other);
+	return *this;
+}
+
+components::String & components::String::operator=(const char c)
+{
+	this->setValue(c);
+	return *this;
+}
+
+components::String & components::String::operator=(const String & other)
+{
+	this->setValue(other.getValue());
+	return *this;
 }
 
 bool components::String::operator==(const String & other) const
@@ -94,12 +194,29 @@ bool components::String::operator==(const String & other) const
 	return true;
 }
 
+bool components::String::operator==(const char * other) const
+{
+	if (strlen(other) != this->getLen())
+	{
+		return false;
+	}
+	for (size_t i = 0; i < this->getLen(); i++)
+	{
+		if (other[i] != this->getValue()[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 components::String & components::String::operator+=(const String & other)
 {
 	const size_t thisLen = this->getLen();
 	const size_t otherLen = other.getLen();
 
-	char * newValue = new char[thisLen + otherLen + 1];
+	size_t new_capacity = thisLen + otherLen + 1;
+	char * newValue = new char[new_capacity];
 	size_t index = 0;
 	for (size_t i = 0; i < thisLen; i++)
 	{
@@ -116,6 +233,8 @@ components::String & components::String::operator+=(const String & other)
 
 	delete[] this->value;
 	this->value = newValue;
+	this->capacity = new_capacity;
+	this->length = new_capacity - 1;
 	return *this;
 }
 
@@ -123,8 +242,8 @@ components::String & components::String::operator+=(const char * other)
 {
 	const size_t thisLen = this->getLen();
 	const size_t otherLen = strlen(other);
-
-	char * newValue = new char[thisLen + otherLen + 1];
+	size_t new_capacity = thisLen + otherLen + 1;
+	char * newValue = new char[new_capacity];
 	size_t index = 0;
 	for (size_t i = 0; i < thisLen; i++)
 	{
@@ -141,16 +260,45 @@ components::String & components::String::operator+=(const char * other)
 
 	delete[] this->value;
 	this->value = newValue;
+	this->capacity = new_capacity;
+	this->length = new_capacity - 1;
+	return *this;
+}
+
+components::String & components::String::operator+=(const char ch)
+{
+	if (this->capacity > this->length)
+	{
+		this->value[this->length] = ch;
+		this->value[this->length + 1] = '\0';
+		++this->length;
+	}
+	else
+	{
+		char * new_buffer = new char[this->capacity + 1];
+		this->capacity += 1;
+		for (size_t i = 0; i < this->length; i++)
+		{
+			new_buffer[i] = this->value[i];
+		}
+		new_buffer[this->length] = ch;
+		new_buffer[this->length + 1] = '\0';
+		++this->length;
+	}
 	return *this;
 }
 
 const char components::String::operator[](int index) const
 {
-	return this->value[index];
+	return this->charAt(index);
 }
 
-char& components::String::operator[](int index)
+char & components::String::operator[](int index)
 {
+	if (index < 0 || index >= this->length)
+	{
+		throw std::out_of_range("Index out of range");
+	}
 	return this->value[index];
 }
 
