@@ -11,6 +11,11 @@ Number::Number()
 {
 }
 
+components::Number::Number(const string & str)
+{
+	this->value = stod(str);
+}
+
 components::Number::Number(const double v)
 {
 	this->value = v;
@@ -89,14 +94,4 @@ void components::Number::print() const
 void components::Number::print(std::ostream & out) const
 {
 	out << value;
-}
-
-components::NumberCreator::NumberCreator()
-	:ComponentCreator("number")
-{
-}
-
-components::Component * components::NumberCreator::createComponent(std::ifstream & in) const
-{	
-	return new Number();
 }

@@ -15,14 +15,23 @@ void factory::ComponentFactory::registerCreator(const ComponentCreator * creator
 	}
 }
 
-Component * factory::ComponentFactory::create(const char * what, std::ifstream & in)
+List<Component>* factory::ComponentFactory::createFromTokens(Vector<Token>::Iterator & i)
 {
-	for (int i = 0; i < index; i++)
+	List<Component> * result = new List<Component>();
+	while (!i.isDone())
 	{
-		if (strcmp(what, creators[i]->getName()) == 0)
+		for (size_t j = 0; j < this->index; j++)
 		{
-			return creators[i]->createComponent(in);
+			if (this->creators[j]->getBeginToken().getName() == i->getName())
+			{
+				result->add(this->creators[j]->createComponent(i));
+				if (this->creators[j]->getEndToken().getName() != i->getName())
+				{
+					cout << "Expected " << this->creators[j]->getEndToken().getName() << endl;
+				}
+			}
 		}
+		++i;
 	}
-	return nullptr;
+	return result;
 }

@@ -1,8 +1,9 @@
 #pragma once
-#include "String.h"
+#include <string>
+using std::string;
+
 #include "Vector.hpp"
 using tools::Vector;
-using components::String;
 
 enum TokenNames 
 {
@@ -33,18 +34,18 @@ public:
 	~Token();
 	Token(TokenNames name, const char * value);
 	Token(TokenNames name, const char ch);
-	Token(TokenNames name, const String & value);
+	Token(TokenNames name, const string & value);
 	const TokenNames getName() const;
-	const String & getValue() const;
+	const string & getValue() const;
 	void setName(TokenNames name);
 	void setValue(const char * value);
-	void setValue(const String & value);
+	void setValue(const string & value);
 
 	// operators
 	Token & operator=(const Token & other);
 private:
 	TokenNames name;
-	String value;
+	string value;
 };
 
 std::ostream & operator<<(std::ostream & os, const Token & t);
@@ -52,7 +53,7 @@ std::ostream & operator<<(std::ostream & os, const Token & t);
 class Tokenizer
 {
 public:
-	static Vector<Token> tokenize(const String & str);
+	static Vector<Token> tokenize(const string & str);
 private:
 	Tokenizer();
 };

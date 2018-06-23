@@ -1,6 +1,8 @@
 #include "JSONParser.h"
 #include <fstream>
-#include "String.h"
+#include "Tokenizer.h"
+#include "ComponentFactory.h"
+using factory::ComponentFactory;
 
 using std::ifstream;
 using namespace interpreters;
@@ -8,12 +10,6 @@ using namespace interpreters;
 JSONParser::JSONParser()
 {
 	this->list = new List<Component>();
-}
-
-JSONParser::JSONParser(DynamicArray<Component>* list, const char * path)
-{
-	this->list = list;
-	this->load(path);
 }
 
 JSONParser::~JSONParser()
@@ -39,7 +35,7 @@ void JSONParser::print() const
 	}
 }
 
-const String & interpreters::JSONParser::getFile() const
+const string & interpreters::JSONParser::getFile() const
 {
 	return this->file;
 }
@@ -64,6 +60,11 @@ bool JSONParser::load(const char * path)
 			this->file += buffer;
 		}
 	}
+	Vector<Token> tokens = Tokenizer::tokenize(this->file);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	this->list = ComponentFactory::getFactory().createFromTokens(i);
+	this->list->getAt(0)->print();
+
 	return true;
 }
 

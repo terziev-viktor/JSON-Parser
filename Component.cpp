@@ -9,9 +9,10 @@ Component::~Component()
 
 }
 
-components::ComponentCreator::ComponentCreator(const char * name)
+components::ComponentCreator::ComponentCreator(Token begin, Token end)
 {
-	strcpy(this->name, name);
+	this->begin = begin;
+	this->end = end;
 	factory::ComponentFactory::getFactory().registerCreator(this);
 }
 
@@ -19,7 +20,12 @@ components::ComponentCreator::~ComponentCreator()
 {
 }
 
-const char * components::ComponentCreator::getName() const
+const Token & components::ComponentCreator::getBeginToken() const
 {
-	return this->name;
+	return this->begin;
+}
+
+const Token & components::ComponentCreator::getEndToken() const
+{
+	return this->end;
 }

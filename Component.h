@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include "Tokenizer.h"
+
 namespace components
 {
     // This class represents the abstraction of different json parts (key-value-pairs, composite objects)
@@ -15,13 +17,15 @@ namespace components
 	class ComponentCreator
 	{
 	public:
-		ComponentCreator(const char * name);
+		ComponentCreator(Token begin, Token end);
 		virtual ~ComponentCreator();
 
-		virtual Component * createComponent(std::ifstream & in) const = 0;
-		const char * getName() const;
+		virtual Component * createComponent(Vector<Token>::Iterator & i) const = 0;
+		const Token & getBeginToken() const;
+		const Token & getEndToken() const;
 	protected:
-		static const int MAX_NAME_LEN = 100;
-		char name[MAX_NAME_LEN];
+		Token begin;
+		Token end;
+
 	};
 } // components

@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include <string>
+using std::string;
 #include <fstream>
 //using factory::ComponentCreator;
 
@@ -9,6 +11,7 @@ namespace components
 	{
 	public:
 		Number();
+		Number(const string & str);
 		Number(const double v);
 		~Number();
 		static const double EPS;
@@ -31,13 +34,4 @@ namespace components
 		double value;
 		
 	};
-
-	class NumberCreator : public ComponentCreator
-	{
-	public:
-		NumberCreator();
-		Component * createComponent(std::ifstream & in) const;
-	};
-
-	static NumberCreator theNumberCreator;
 }

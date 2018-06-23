@@ -8,6 +8,8 @@ using std::endl;
 components::String::String()
 {
 	this->value = nullptr;
+	this->length = 0;
+	this->capacity = 0;
 }
 
 components::String::String(size_t capacity)
@@ -28,6 +30,14 @@ components::String::String(const String & other)
 		this->value[i] = other[i];
 	}
 	this->value[this->length] = '\0';
+}
+
+components::String::String(const string & other)
+{
+	this->length = other.length();
+	this->capacity = other.length() + 1;
+	this->value = new char[this->capacity];
+	strcpy_s(this->value, this->capacity, other.c_str());
 }
 
 components::String::String(const char * value)
@@ -75,7 +85,7 @@ components::String components::String::substring(size_t from, size_t to) const
 	return result;
 }
 
-const int components::String::firstIndexOf(const char c, size_t start_from) const
+const int components::String::find_first(const char c, size_t start_from) const
 {
 	for (int i = start_from; i < this->length; ++i)
 	{
@@ -87,7 +97,7 @@ const int components::String::firstIndexOf(const char c, size_t start_from) cons
 	return -1;
 }
 
-const int components::String::firstIndexOf(const char * c, size_t start_from) const
+const int components::String::find_first_of(const char * c, size_t start_from) const
 {
 	size_t len = strlen(c);
 	for (int i = start_from; i < this->length; ++i)
@@ -300,16 +310,6 @@ char & components::String::operator[](int index)
 		throw std::out_of_range("Index out of range");
 	}
 	return this->value[index];
-}
-
-components::StringCreator::StringCreator()
-	:ComponentCreator("string")
-{
-}
-
-components::Component * components::StringCreator::createComponent(std::ifstream & in) const
-{
-	return new components::String();
 }
 
 std::ostream & components::operator<<(std::ostream & os, const String & obj)

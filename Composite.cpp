@@ -93,11 +93,11 @@ Leaf * components::Composite::operator[](const char * name)
 }
 
 components::CompositeCreator::CompositeCreator()
-	:ComponentCreator("composite")
+	:ComponentCreator(Token(TokenNames::ObjectBegin, '{'), Token(TokenNames::ObjectEnd, '}'))
 {
 }
 
-Component * components::CompositeCreator::createComponent(std::ifstream & in) const
+Component * components::CompositeCreator::createComponent(Vector<Token>::Iterator & i) const
 {
 	return new Composite();
 }

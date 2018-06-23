@@ -35,7 +35,7 @@ namespace components
 	{
 	public:
 		CompositeCreator();
-		Component * createComponent(std::ifstream & in) const;
+		Component * createComponent(Vector<Token>::Iterator & i) const;
 	};
 
 	static CompositeCreator theCompositeCreator;

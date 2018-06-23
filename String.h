@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
-
+#include <string>
+using std::string;
 //using factory::ComponentCreator;
 namespace components
 {
@@ -10,14 +11,15 @@ namespace components
 		String();
 		String(size_t capacity);
 		String(const String & other);
+		String(const string & other);
 		// value should be a string ending with '\0'
 		String(const char * value);
 		~String();
 		const char * getValue() const;
 		const size_t getLen() const;
 		String substring(size_t from, size_t to) const;
-		const int firstIndexOf(const char c, size_t start_from = 0) const;
-		const int firstIndexOf(const char * c, size_t start_from = 0) const;
+		const int find_first(const char c, size_t start_from = 0) const;
+		const int find_first_of(const char * c, size_t start_from = 0) const;
 
 		const char charAt(unsigned int at) const;
 		void setValue(const char * value);
@@ -44,16 +46,6 @@ namespace components
 		size_t length;
 		size_t capacity;
 	};
-
-	class StringCreator : public ComponentCreator
-	{
-	public:
-		StringCreator();
-		Component * createComponent(std::ifstream & in) const;
-	};
-
-	static StringCreator theStringCreator;
-
 	std::ostream & operator<<(std::ostream&, const String &);
 }
 

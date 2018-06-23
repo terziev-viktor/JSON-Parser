@@ -29,7 +29,7 @@ namespace components
 	{
 	public:
 		ArrayCreator();
-		Component * createComponent(std::ifstream &) const;
+		Component * createComponent(Vector<Token>::Iterator & i) const;
 	};
 
 	static ArrayCreator theArrayCreator;

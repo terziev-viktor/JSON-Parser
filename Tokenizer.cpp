@@ -1,12 +1,10 @@
 #include "Tokenizer.h"
-using std::cout;
-using std::endl;
 
-Vector<Token> Tokenizer::tokenize(const String & str)
+Vector<Token> Tokenizer::tokenize(const string & str)
 {
 	Vector<Token> tokens;
 	bool EndOfStringReached = false;
-	for (size_t i = 0; !EndOfStringReached && i < str.getLen(); ++i)
+	for (size_t i = 0; !EndOfStringReached && i < str.length(); ++i)
 	{
 		char current = str[i];
 		switch (current)
@@ -37,7 +35,7 @@ Vector<Token> Tokenizer::tokenize(const String & str)
 		}
 		case ',':
 		{
-			Token t(TokenNames::ObjectEnd, ',');
+			Token t(TokenNames::Comma, ',');
 			tokens.add(t);
 			break;
 		}
@@ -86,14 +84,14 @@ Vector<Token> Tokenizer::tokenize(const String & str)
 		}
 		default:
 		{
-			int to = str.firstIndexOf(",\"", i);
+			int to = str.find_first_of(",\"", i);
 			if (to == -1)
 			{
 				Token t(TokenNames::Unknown, '0');
 				tokens.add(t);
 				break;
 			}
-			String stringValue = str.substring(i, to);
+			string stringValue = str.substr(i, to - i);
 			i = to - 1;
 			Token t(TokenNames::StringOrNumber, stringValue);
 			tokens.add(t);
@@ -129,7 +127,7 @@ Token::Token(TokenNames name, const char ch)
 	this->value = ch;
 }
 
-Token::Token(TokenNames name, const String & value)
+Token::Token(TokenNames name, const string & value)
 {
 	this->setName(name);
 	this->setValue(value);
@@ -140,7 +138,7 @@ const TokenNames Token::getName() const
 	return this->name;
 }
 
-const String & Token::getValue() const
+const string & Token::getValue() const
 {
 	return this->value;
 }
@@ -155,7 +153,7 @@ void Token::setValue(const char * value)
 	this->value = value;
 }
 
-void Token::setValue(const String & value)
+void Token::setValue(const string & value)
 {
 	this->value = value;
 }

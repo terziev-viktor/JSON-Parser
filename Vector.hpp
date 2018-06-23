@@ -239,7 +239,7 @@ namespace tools
 		os << '(';
 		for (unsigned int i = 0; i < v.count() - 1; i++)
 		{
-			os << v.getAt(i) << ", ";
+			os << v.getAt(i) << "\n";
 		}
 		os << v.getAt(v.count() - 1) << ')';
 		return os;

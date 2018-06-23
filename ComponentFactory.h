@@ -2,6 +2,9 @@
 #include "Component.h"
 using components::Component;
 using components::ComponentCreator;
+#include "tools\List.hpp"
+using tools::List;
+#include "Tokenizer.h"
 
 namespace factory
 {
@@ -10,7 +13,7 @@ namespace factory
 	public:
 		static ComponentFactory & getFactory();
 		void registerCreator(const ComponentCreator * creator);
-		Component * create(const char * what, std::ifstream & in);
+		List<Component> * createFromTokens(Vector<Token>::Iterator & i);
 
 	private:
 		ComponentFactory():index(0){}

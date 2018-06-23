@@ -22,8 +22,7 @@ using namespace interpreters;
 
 int main()
 {
-	String json("{ \"key1\":\"value1\"	\n }");
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	cout << tokens << endl;
+	JSONParser json;
+	json.load("file.json");
 	return 0;
 }
