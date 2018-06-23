@@ -1,4 +1,8 @@
 #include "JSONParser.h"
+#include "Composite.h"
+#include <fstream>
+using components::Composite;
+
 using interpreters::JSONParser;
 
 // This is a .NET solution
@@ -7,9 +11,11 @@ using interpreters::JSONParser;
 
 int main()
 {
-	JSONParser json;
-	json.load("file.json");
-	json.get(0)->print();
-
+	JSONParser parser;
+	parser.parse("file.json");
+	Component * json = parser[0];
+	std::ofstream out;
+	out.open("result.json");
+	json->print(out);
 	return 0;
 }

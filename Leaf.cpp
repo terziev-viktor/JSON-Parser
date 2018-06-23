@@ -27,15 +27,15 @@ Leaf::~Leaf()
 	delete this->value;
 }
 
-void Leaf::print() const
+void components::Leaf::print(unsigned short tab_index) const
 {
-	print(cout);
+	print(cout, tab_index);
 }
 
-void components::Leaf::print(std::ostream & out) const
+void components::Leaf::print(std::ostream & out, unsigned short tab_index) const
 {
-	out << name << ':';
-	this->value->print(out);
+	out << "\"" << name << "\"" << ':';
+	this->value->print(out, tab_index);
 }
 
 const Component * components::Leaf::getValue() const
@@ -61,5 +61,15 @@ void components::Leaf::setName(const string & name)
 void components::Leaf::setValue(Component * value)
 {
 	this->value = value;
+}
+
+Component * components::Leaf::operator[](unsigned int index)
+{
+	return this->value;
+}
+
+const Component * components::Leaf::operator[](unsigned int index) const
+{
+	return this->value;
 }
 

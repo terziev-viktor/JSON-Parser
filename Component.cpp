@@ -9,6 +9,16 @@ Component::~Component()
 
 }
 
+Component * components::Component::operator->()
+{
+	return this;
+}
+
+Component & components::Component::operator*()
+{
+	return *this;
+}
+
 components::ComponentCreator::ComponentCreator(Token begin, Token end)
 {
 	this->begin = begin;

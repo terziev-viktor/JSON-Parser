@@ -28,8 +28,11 @@ namespace components
 		Number & operator-=(const Number & other);
 		Number & operator*=(const Number & other);
 		Number & operator/=(const Number & other);
-		void print() const;
-		void print(std::ostream & out) const;
+		void print(unsigned short tab_index = 0) const;
+		void print(std::ostream & out, unsigned short tab_index = 0) const;
+
+		Component * operator[](unsigned int index);
+		const Component * operator[](unsigned int index) const;
 	private:
 		double value;
 		

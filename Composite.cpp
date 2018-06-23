@@ -15,22 +15,34 @@ Composite::~Composite()
 {
 }
 
-void Composite::print() const
+void Composite::print(unsigned short tab_index) const
 {
-	print(cout);
+	print(cout, tab_index);
 }
 
-void components::Composite::print(std::ostream & out) const
+void components::Composite::print(std::ostream & out, unsigned short tab_index) const
 {
 	out << "{\n";
 
-	for (size_t i = 0; i < this->leafs.count(); ++i)
+	for (size_t i = 0; i < this->leafs.count() - 1; ++i)
+	{
+		for (unsigned short i = 0; i <= tab_index; i++)
+		{
+			out << '\t';
+		}
+		leafs.getAt(i)->print(out, tab_index + 1);
+		out << ',' << endl;
+	}
+	for (unsigned short i = 0; i <= tab_index; i++)
 	{
 		out << '\t';
-		leafs.getAt(i)->print(out);
-		out << endl;
 	}
-
+	leafs.getAt(leafs.count() - 1)->print(out, tab_index + 1);
+	out << endl;
+	for (unsigned short i = 0; i < tab_index; i++)
+	{
+		out << '\t';
+	}
 	out << "}\n";
 }
 
@@ -73,12 +85,12 @@ void Composite::addLeaf(Leaf * child)
     this->leafs.add(child);
 }
 
-const Leaf * components::Composite::operator[](int n) const
+const Component * components::Composite::operator[](unsigned int n) const
 {
 	return this->getLeaf(n);
 }
 
-Leaf * components::Composite::operator[](int n)
+Component * components::Composite::operator[](unsigned int n)
 {
 	return this->getLeaf(n);
 }

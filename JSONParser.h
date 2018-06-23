@@ -15,8 +15,11 @@ namespace interpreters
 		JSONParser();
 		
 		~JSONParser();
-		bool load(const char * path);
+		bool parse(const char * path);
 		const Component * get(unsigned int index) const;
+		const Component * operator[](unsigned int index) const;
+		Component * operator[](unsigned int index);
+
 		void add(Component * component);
 		void print() const;
 		const string & getFile() const;

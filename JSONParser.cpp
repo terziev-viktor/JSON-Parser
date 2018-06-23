@@ -22,6 +22,17 @@ const Component * JSONParser::get(unsigned int index) const
 	return this->list->getAt(index);
 }
 
+const Component * interpreters::JSONParser::operator[](unsigned int index) const
+{
+	return this->list->getAt(index);
+}
+
+Component * interpreters::JSONParser::operator[](unsigned int index)
+{
+	return this->list->getAt(index);
+	return nullptr;
+}
+
 void JSONParser::add(Component * component)
 {
 	this->list->add(component);
@@ -40,7 +51,7 @@ const string & interpreters::JSONParser::getFile() const
 	return this->file;
 }
 
-bool JSONParser::load(const char * path)
+bool JSONParser::parse(const char * path)
 {
 	ifstream in;
 	char buffer[1025];

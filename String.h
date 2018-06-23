@@ -27,8 +27,8 @@ namespace components
 		const bool startsWith(const char ch) const;
 
 		// override virtual function
-		void print() const;
-		void print(std::ostream & out) const;
+		void print(unsigned short tab_index = 0) const;
+		void print(std::ostream & out, unsigned short tab_index = 0) const;
 
 		// Operators
 		String & operator=(const char * other);
@@ -39,8 +39,8 @@ namespace components
 		String & operator+=(const String & other);
 		String & operator+=(const char * other);
 		String & operator+=(const char ch);
-		const char operator[](int index) const;
-		char & operator[](int index);
+		const components::Component * operator[](unsigned int index) const;
+		components::Component * operator[](unsigned int index);
 	private:
 		char * value;
 		size_t length;

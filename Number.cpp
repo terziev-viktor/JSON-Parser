@@ -85,13 +85,22 @@ Number & components::Number::operator/=(const Number & other)
 	return *this;
 }
 
-
-void components::Number::print() const
+void components::Number::print(unsigned short tab_index) const
 {
 	print(cout);
 }
 
-void components::Number::print(std::ostream & out) const
+void components::Number::print(std::ostream & out, unsigned short tab_index) const
 {
 	out << value;
+}
+
+components::Component * components::Number::operator[](unsigned int index)
+{
+	return this;
+}
+
+const components::Component * components::Number::operator[](unsigned int index) const
+{
+	return this;
 }

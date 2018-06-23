@@ -27,7 +27,7 @@ components::String::String(const String & other)
 	this->value = new char[this->capacity];
 	for (size_t i = 0; i < this->length; i++)
 	{
-		this->value[i] = other[i];
+		this->value[i] = other.value[i];
 	}
 	this->value[this->length] = '\0';
 }
@@ -155,14 +155,14 @@ const bool components::String::startsWith(const char ch) const
 	return this->value[0] == ch;
 }
 
-void components::String::print() const
+void components::String::print(unsigned short tab_index) const
 {
 	print(cout);
 }
 
-void components::String::print(std::ostream & out) const
+void components::String::print(std::ostream & out, unsigned short tab_index) const
 {
-	out << this->value;
+	out << "\"" << this->value << "\"";
 }
 
 components::String & components::String::operator=(const char * other)
@@ -298,18 +298,18 @@ components::String & components::String::operator+=(const char ch)
 	return *this;
 }
 
-const char components::String::operator[](int index) const
+const components::Component * components::String::operator[](unsigned int index) const
 {
-	return this->charAt(index);
+	return new String(this->charAt(index));
 }
 
-char & components::String::operator[](int index)
+components::Component * components::String::operator[](unsigned int index)
 {
 	if (index < 0 || index >= this->length)
 	{
 		throw std::out_of_range("Index out of range");
 	}
-	return this->value[index];
+	return new String(this->value[index]);
 }
 
 std::ostream & components::operator<<(std::ostream & os, const String & obj)

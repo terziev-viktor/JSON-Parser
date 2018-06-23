@@ -18,8 +18,8 @@ namespace components
     public:
 		Composite();
     	~Composite();
-		void print() const;
-		void print(std::ostream & out) const;
+		void print(unsigned short tab_index = 0) const;
+		void print(std::ostream & out, unsigned short tab_index = 0) const;
 		// gets the n'th leaf
 		const Leaf * getLeaf(int n) const;
 		Leaf * getLeaf(int n);
@@ -28,8 +28,9 @@ namespace components
 		Leaf * getLeaf(const char * name);
     	void addLeaf(Leaf * child);
 
-		const Leaf * operator[](int n) const;
-		Leaf * operator[](int n);
+		const Component * operator[](unsigned int n) const;
+		Component * operator[](unsigned int n);
+
 		const Leaf * operator[](const char * name) const;
 		Leaf * operator[](const char * name);
 

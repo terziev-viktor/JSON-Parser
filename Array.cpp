@@ -36,37 +36,35 @@ const unsigned int components::Array::size() const
 	return this->values.count();
 }
 
-components::Component * components::Array::operator[](int index)
+components::Component * components::Array::operator[](unsigned int index)
 {
 	return this->values.getAt(index);
 }
 
-const components::Component * components::Array::operator[](int index) const
+const components::Component * components::Array::operator[](unsigned int index) const
 {
 	return this->values.getAt(index);
 }
-
 // override
 
-void components::Array::print(std::ostream & out) const
+void components::Array::print(std::ostream & out, unsigned short tab_index) const
 {
 	out << '[';
 	if (this->values.count() > 0)
 	{
 		for (size_t i = 0; i < this->values.count() - 1; i++)
 		{
-			this->values.getAt(i)->print();
+			this->values.getAt(i)->print(out, tab_index);
 			out << ", ";
 		}
 
-		this->values.getAt(this->values.count() - 1)->print();
+		this->values.getAt(this->values.count() - 1)->print(out, tab_index);
 	}
-
 	out << ']';
 }
-void components::Array::print() const
+void components::Array::print(unsigned short tab_index) const
 {
-	this->print(cout);
+	this->print(cout, tab_index);
 }
 
 components::ArrayCreator::ArrayCreator()
