@@ -1,7 +1,7 @@
 #pragma once
 #include "String.h"
-#include "Stack.hpp"
-using tools::Stack;
+#include "Vector.hpp"
+using tools::Vector;
 using components::String;
 
 enum TokenNames 
@@ -52,7 +52,7 @@ std::ostream & operator<<(std::ostream & os, const Token & t);
 class Tokenizer
 {
 public:
-	static Stack<Token> tokenize(const String & str);
+	static Vector<Token> tokenize(const String & str);
 private:
 	Tokenizer();
 };

@@ -1,8 +1,6 @@
 #pragma once
 #include "tools\DynamicArray.hpp"
 #include <stdexcept>
-using std::cout;
-using std::endl;
 namespace tools
 {
 	template<class T>
@@ -23,6 +21,107 @@ namespace tools
 		void clear();
 		// returns count of elements in the array
 		const unsigned int count() const;
+		class Iterator
+		{
+		private:
+			T * front; // start of data array
+			T * current; // position of pointer to data 
+			unsigned int size; // size of data array
+			T * end; // end of data array
+		public:
+			Iterator(T * start, unsigned int size)
+			{
+				this->front = start;
+				this->current = start;
+				this->size = size;
+				this->end = start + size;
+			}
+			Iterator(const Iterator & other)
+			{
+				this->front = other.front;
+				this->current = other.current;
+				this->size = other.size;
+				this->end = other.end;
+			}
+			const T * first() const
+			{
+				return this->front;
+			}
+			const T * last() const
+			{
+				return this->last;
+			}
+			void next()
+			{
+				++this->current;
+			}
+
+			bool hasNext() const
+			{
+				return this->current < this->last;
+			}
+			bool isDone() const
+			{
+				return this->current == this->end;
+			}
+			const Iterator & operator++(int)
+			{
+				++this->current;
+				return *this;
+			}
+			Iterator & operator++()
+			{
+				Iterator tmp = *this;
+				++this->current;
+				return tmp;
+			}
+
+			const Iterator & operator--(int)
+			{
+				Iterator tmp = *this;
+				--this->current;
+				return tmp;
+			}
+			Iterator & operator--()
+			{
+				--this->current;
+				return *this;
+			}
+			T * operator->()
+			{
+				return this->current;
+			}
+			T & operator*()
+			{
+				return *this->current;
+			}
+			bool operator<(int i)
+			{
+				return current < (this->front + i);
+			}
+			bool operator>(int i)
+			{
+				return current > (this->front + i);
+			}
+			bool operator==(int i)
+			{
+				return current == (this->front + i);
+			}
+			bool operator>=(int i)
+			{
+				return current >= (this->front + i);
+			}
+			bool operator<=(int i)
+			{
+				return current <= (this->front + i);
+			}
+		};
+
+		Iterator createIterator() const
+		{
+			Iterator i(this->buffer, this->index);
+			return i;
+		}
 	private:
 		static const unsigned int INIT_SIZE = 15;
 		unsigned int size;
@@ -134,4 +233,15 @@ namespace tools
 		this->buffer = biggerBuffer;
 	}
 
+	template<class T>
+	std::ostream & operator<<(std::ostream & os, const Vector<T> & v)
+	{
+		os << '(';
+		for (unsigned int i = 0; i < v.count() - 1; i++)
+		{
+			os << v.getAt(i) << ", ";
+		}
+		os << v.getAt(v.count() - 1) << ')';
+		return os;
+	}
 }

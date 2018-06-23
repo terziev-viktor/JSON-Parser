@@ -2,9 +2,9 @@
 using std::cout;
 using std::endl;
 
-Stack<Token> Tokenizer::tokenize(const String & str)
+Vector<Token> Tokenizer::tokenize(const String & str)
 {
-	Stack<Token> tokens;
+	Vector<Token> tokens;
 	bool EndOfStringReached = false;
 	for (size_t i = 0; !EndOfStringReached && i < str.getLen(); ++i)
 	{
@@ -14,73 +14,73 @@ Stack<Token> Tokenizer::tokenize(const String & str)
 		case '{':
 		{
 			Token t(TokenNames::ObjectBegin, '{');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '}':
 		{
 			Token t(TokenNames::ObjectEnd, '{');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '[':
 		{
 			Token t(TokenNames::ArrayBegin, '[');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case ']':
 		{
 			Token t(TokenNames::ArrayEnd, ']');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case ',':
 		{
 			Token t(TokenNames::ObjectEnd, ',');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case ':':
 		{
 			Token t(TokenNames::KeyValSeparator, ':');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '"':
 		{
 			Token t(TokenNames::DoubleQuote, '"');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '\'':
 		{
 			Token t(TokenNames::SingleQuote, '\'');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case ' ':
 		{
 			Token t(TokenNames::Spacebar, ' ');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '\t':
 		{
 			Token t(TokenNames::Tab, '\t');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '\n':
 		{
 			Token t(TokenNames::NewLine, '\n');
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		case '\0':
 		{
 			Token t(TokenNames::EndOfString, '\0');
-			tokens.push(t);
+			tokens.add(t);
 			EndOfStringReached = true;
 			break;
 		}
@@ -90,13 +90,13 @@ Stack<Token> Tokenizer::tokenize(const String & str)
 			if (to == -1)
 			{
 				Token t(TokenNames::Unknown, '0');
-				tokens.push(t);
+				tokens.add(t);
 				break;
 			}
 			String stringValue = str.substring(i, to);
 			i = to - 1;
 			Token t(TokenNames::StringOrNumber, stringValue);
-			tokens.push(t);
+			tokens.add(t);
 			break;
 		}
 		}
