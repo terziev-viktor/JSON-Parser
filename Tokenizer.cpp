@@ -84,7 +84,7 @@ Vector<Token> Tokenizer::tokenize(const string & str)
 		}
 		default:
 		{
-			int to = str.find_first_of(",\"", i);
+			int to = str.find_first_of("]},\"", i);
 			if (to == -1)
 			{
 				Token t(TokenNames::Unknown, '0');

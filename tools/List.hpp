@@ -15,6 +15,7 @@ namespace tools
 	{
 	public:
 		List();
+		List(const List & other);
 		~List();
 	
 		// class T should have a proper operator= implemented
@@ -29,12 +30,16 @@ namespace tools
 		void clear();
 		// returns count of elements in the array
 		const unsigned int count() const;
+		// operators
+		List<T> & operator=(const List<T> & other);
+		operator bool();
+		bool operator !();
 	private:
 		static const unsigned int INIT_SIZE = 15;
 		unsigned int size;
 		unsigned int index;
 		T * * buffer;
-	
+		
 		void expand();
 		void deleteBufferContent();
 	};
@@ -45,6 +50,17 @@ namespace tools
 		this->size = INIT_SIZE;
 		this->index = 0;
 		this->buffer = new T*[this->size];
+	}
+	template<class T>
+	inline List<T>::List(const List & other)
+	{
+		this->size = other.size;
+		this->index = other.index;
+		this->buffer = new T*[this->size];
+		for (unsigned int i = 0; i < this->index; i++)
+		{
+			this->buffer[i] = other.buffer[i];
+		}
 	}
 	template<class T>
 	inline List<T>::~List()
@@ -124,6 +140,32 @@ namespace tools
 	inline const unsigned int List<T>::count() const
 	{
 		return this->index;
+	}
+
+	template<class T>
+	inline List<T>& List<T>::operator=(const List<T>& other)
+	{
+		this->deleteBufferContent();
+		this->size = other.size;
+		this->index = other.index;
+		this->buffer = new T*[this->size];
+		for (unsigned int i = 0; i < this->index; i++)
+		{
+			this->buffer[i] = other.buffer[i];
+		}
+		return *this;
+	}
+
+	template<class T>
+	inline List<T>::operator bool()
+	{
+		return this->index != 0;
+	}
+
+	template<class T>
+	inline bool List<T>::operator!()
+	{
+		return this->index == 0;
 	}
 	
 	template<class T>

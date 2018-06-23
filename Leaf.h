@@ -2,8 +2,8 @@
 #include "Component.h"
 //using factory::ComponentCreator;
 
-#include <cstring>
-
+#include <string>
+using std::string;
 namespace components
 {
 	// This is a component with no children
@@ -18,6 +18,9 @@ namespace components
 		void print(std::ostream & out) const;
 		const Component * getValue() const;
 		const char * getName() const;
+		void setName(const char * name);
+		void setName(const string & name);
+		void setValue(Component * value);
 
     private:
     	char name[100];

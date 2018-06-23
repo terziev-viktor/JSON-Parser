@@ -99,5 +99,86 @@ components::CompositeCreator::CompositeCreator()
 
 Component * components::CompositeCreator::createComponent(Vector<Token>::Iterator & i) const
 {
-	return new Composite();
+	Composite * result = new Composite();
+
+	if (i->getName() != TokenNames::ObjectBegin)
+	{
+		cout << " Expected '{'" << endl;
+		return result;
+	}
+	++i; // skipping '{'
+	while (i->getName() != TokenNames::ObjectEnd)
+	{
+		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
+
+		if (i->getName() != TokenNames::DoubleQuote)
+		{
+			cout << "Expected '\"'" << endl;
+			return result;
+		}
+		++i; // skipping "
+		Leaf * keyValue = new Leaf();
+		keyValue->setName(i->getValue());
+		++i;
+		if (i->getName() != TokenNames::DoubleQuote)
+		{
+			cout << "Expected '\"'" << endl;
+			delete keyValue;
+			return result;
+		}
+		++i;
+		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
+
+		if (i->getName() != TokenNames::KeyValSeparator)
+		{
+			cout << "Expected key value separator ':'" << endl;
+			return result;
+		}
+		++i;
+		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
+		if (i->getName() == TokenNames::DoubleQuote) // the value is a string
+		{
+			++i;
+			keyValue->setValue(new String(i->getValue()));
+			++i;
+			if (i->getName() != TokenNames::DoubleQuote)
+			{
+				cout << "Expected '\"'" << endl;
+				delete keyValue;
+				return result;
+			}
+			++i;
+		}
+		else if (i->getName() == TokenNames::StringOrNumber)
+		{
+			try
+			{
+				keyValue->setValue(new Number(i->getValue()));
+				++i;
+			}
+			catch (const std::invalid_argument& e)
+			{
+				cout << "Not a number " << endl;
+				delete keyValue;
+				return result;
+			}
+		}
+		else
+		{
+			Component * l = ComponentFactory::getFactory().createNextFromTokens(i);
+			if (!l)
+			{
+				cout << "Error" << endl;
+				delete keyValue;
+				return result;
+			}
+			keyValue->setValue(l);
+			++i;
+		}
+		result->addLeaf(keyValue);
+
+		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::Comma || i->getName() == NewLine) { ++i; } // skipping whipespace
+
+	}
+	return result;
 }

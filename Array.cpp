@@ -114,13 +114,13 @@ components::Component * components::ArrayCreator::createComponent(Vector<Token>:
 		}
 		else
 		{
-			List<Component> * l = ComponentFactory::getFactory().createFromTokens(i);
-			if (!l)
+			Component * complex = ComponentFactory::getFactory().createNextFromTokens(i);
+			if (!complex)
 			{
 				cout << "Error on line n" << endl;
 				return result;
 			}
-			result->add(l->getAt(0));
+			result->add(complex);
 			++i;
 		}
 		while (!i.isDone() && (i->getName() == TokenNames::Tab || i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Comma)) { ++i; }

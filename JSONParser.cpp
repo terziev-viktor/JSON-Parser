@@ -9,7 +9,7 @@ using namespace interpreters;
 
 JSONParser::JSONParser()
 {
-	this->list = new List<Component>();
+	this->list = nullptr;
 }
 
 JSONParser::~JSONParser()
@@ -31,7 +31,7 @@ void JSONParser::print() const
 {
 	for (unsigned int i = 0; i < this->list->count(); i++)
 	{
-		list->getAt(i)->print();
+		this->list->getAt(i)->print();
 	}
 }
 
@@ -63,8 +63,6 @@ bool JSONParser::load(const char * path)
 	Vector<Token> tokens = Tokenizer::tokenize(this->file);
 	Vector<Token>::Iterator i = tokens.createIterator();
 	this->list = ComponentFactory::getFactory().createFromTokens(i);
-	this->list->getAt(0)->print();
-
 	return true;
 }
 

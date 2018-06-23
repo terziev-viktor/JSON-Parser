@@ -15,23 +15,36 @@ void factory::ComponentFactory::registerCreator(const ComponentCreator * creator
 	}
 }
 
-List<Component>* factory::ComponentFactory::createFromTokens(Vector<Token>::Iterator & i)
+List<Component> * factory::ComponentFactory::createFromTokens(Vector<Token>::Iterator & i)
 {
 	List<Component> * result = new List<Component>();
 	while (!i.isDone())
 	{
-		for (size_t j = 0; j < this->index; j++)
+		Component * next = ComponentFactory::getFactory().createNextFromTokens(i);
+		if (next != nullptr)
 		{
-			if (this->creators[j]->getBeginToken().getName() == i->getName())
-			{
-				result->add(this->creators[j]->createComponent(i));
-				if (this->creators[j]->getEndToken().getName() != i->getName())
-				{
-					cout << "Expected " << this->creators[j]->getEndToken().getName() << endl;
-				}
-			}
+			result->add(next);
 		}
 		++i;
 	}
 	return result;
+}
+
+Component * factory::ComponentFactory::createNextFromTokens(Vector<Token>::Iterator & i)
+{
+	Component * next = nullptr;
+	for (size_t j = 0; j < this->index; j++)
+	{
+		if (this->creators[j]->getBeginToken().getName() == i->getName())
+		{
+			next = this->creators[j]->createComponent(i);
+			//next->print();
+			if (this->creators[j]->getEndToken().getName() != i->getName())
+			{
+				cout << "Expected " << this->creators[j]->getEndToken().getName() << endl;
+			}
+			return next;
+		}
+	}
+	return nullptr;
 }

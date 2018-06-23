@@ -1,12 +1,18 @@
 #pragma once
 #include "Leaf.h"
 #include "tools/List.hpp"
+#include "String.h"
+#include "Number.h"
+#include "ComponentFactory.h"
+using factory::ComponentFactory;
+using components::String;
+using components::Number;
 using namespace tools;
 //using factory::ComponentCreator;
 
 namespace components
 {
-	// This is a components with children other components (Leafs ot Composites)
+	// This is a components with children other components (Leafs or Composites)
     class Composite : public Component
     {
     public:

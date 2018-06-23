@@ -62,7 +62,7 @@ namespace tools
 			}
 			bool isDone() const
 			{
-				return this->current == this->end;
+				return this->current >= this->front + this->size;
 			}
 			const Iterator & operator++(int)
 			{
