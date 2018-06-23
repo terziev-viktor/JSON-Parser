@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{044ff44a-79aa-4a91-acbb-08d0a8975975}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Composite.cpp">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="Stack.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bad_json_exception.hpp">
+      <Filter>Exceptions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

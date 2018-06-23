@@ -14,7 +14,7 @@ namespace factory
 		static ComponentFactory & getFactory();
 		void registerCreator(const ComponentCreator * creator);
 		List<Component> * createFromTokens(Vector<Token>::Iterator & i);
-		Component * createNextFromTokens(Vector<Token>::Iterator & i);
+		Component * createNextFromTokens(Vector<Token>::Iterator & i, unsigned int & line_number);
 
 	private:
 		ComponentFactory():index(0){}

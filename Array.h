@@ -29,7 +29,7 @@ namespace components
 	{
 	public:
 		ArrayCreator();
-		Component * createComponent(Vector<Token>::Iterator & i) const;
+		Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const;
 	};
 
 	static ArrayCreator theArrayCreator;

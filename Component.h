@@ -20,7 +20,8 @@ namespace components
 		ComponentCreator(Token begin, Token end);
 		virtual ~ComponentCreator();
 
-		virtual Component * createComponent(Vector<Token>::Iterator & i) const = 0;
+		virtual Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const = 0;
+		void skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number) const;
 		const Token & getBeginToken() const;
 		const Token & getEndToken() const;
 	protected:

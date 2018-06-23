@@ -5,7 +5,8 @@ using std::endl;
 
 #include "Composite.h"
 using namespace components;
-
+#include "bad_json_exception.hpp"
+using json_exceptions::bad_json_exception;
 Composite::Composite()
 {
 }
@@ -97,24 +98,22 @@ components::CompositeCreator::CompositeCreator()
 {
 }
 
-Component * components::CompositeCreator::createComponent(Vector<Token>::Iterator & i) const
+Component * components::CompositeCreator::createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const
 {
 	Composite * result = new Composite();
 
 	if (i->getName() != TokenNames::ObjectBegin)
 	{
-		cout << " Expected '{'" << endl;
-		return result;
+		throw bad_json_exception("Expected begin of object token", line_number);
 	}
 	++i; // skipping '{'
 	while (i->getName() != TokenNames::ObjectEnd)
 	{
-		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
+		this->skipWhitespace(i, line_number);
 
 		if (i->getName() != TokenNames::DoubleQuote)
 		{
-			cout << "Expected '\"'" << endl;
-			return result;
+			throw bad_json_exception("Expected double quote '\"'", line_number);
 		}
 		++i; // skipping "
 		Leaf * keyValue = new Leaf();
@@ -122,17 +121,14 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 		++i;
 		if (i->getName() != TokenNames::DoubleQuote)
 		{
-			cout << "Expected '\"'" << endl;
-			delete keyValue;
-			return result;
+			throw bad_json_exception("Expected double quote '\"'", line_number);
 		}
 		++i;
 		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
 
 		if (i->getName() != TokenNames::KeyValSeparator)
 		{
-			cout << "Expected key value separator ':'" << endl;
-			return result;
+			throw bad_json_exception("Expected key-value separator ':'", line_number);
 		}
 		++i;
 		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
@@ -143,9 +139,7 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 			++i;
 			if (i->getName() != TokenNames::DoubleQuote)
 			{
-				cout << "Expected '\"'" << endl;
-				delete keyValue;
-				return result;
+				throw bad_json_exception("Expected double quote '\"'", line_number);
 			}
 			++i;
 		}
@@ -158,27 +152,26 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 			}
 			catch (const std::invalid_argument& e)
 			{
-				cout << "Not a number " << endl;
-				delete keyValue;
-				return result;
+				throw bad_json_exception("Error converting number value", line_number);
 			}
 		}
 		else
 		{
-			Component * l = ComponentFactory::getFactory().createNextFromTokens(i);
+			Component * l = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
 			if (!l)
 			{
-				cout << "Error" << endl;
-				delete keyValue;
-				return result;
+				throw bad_json_exception("Error parsing json object value", line_number);
 			}
 			keyValue->setValue(l);
 			++i;
 		}
 		result->addLeaf(keyValue);
 
-		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::Comma || i->getName() == NewLine) { ++i; } // skipping whipespace
-
+		this->skipWhitespace(i, line_number);
+		if (i->getName() == TokenNames::Comma && (++i)->getName() == TokenNames::ObjectEnd)
+		{
+			throw bad_json_exception("Unexpected token ','", line_number);
+		}
 	}
 	return result;
 }

@@ -41,7 +41,7 @@ namespace components
 	{
 	public:
 		CompositeCreator();
-		Component * createComponent(Vector<Token>::Iterator & i) const;
+		Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const;
 	};
 
 	static CompositeCreator theCompositeCreator;

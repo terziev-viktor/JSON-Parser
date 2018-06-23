@@ -7,6 +7,9 @@ using components::Number;
 using std::cout;
 #include "String.h"
 #include "ComponentFactory.h"
+#include "bad_json_exception.hpp"
+using json_exceptions::bad_json_exception;
+
 using factory::ComponentFactory;
 
 components::Array::Array()
@@ -71,20 +74,19 @@ components::ArrayCreator::ArrayCreator()
 {
 }
 
-components::Component * components::ArrayCreator::createComponent(Vector<Token>::Iterator & i) const
+components::Component * components::ArrayCreator::createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const
 {
 	Array * result = new Array();
 	// in current pos of i should be token '['
 	if (i->getName() != TokenNames::ArrayBegin)
 	{
-		cout << "Expected begin array token" << endl;
-		return nullptr;
+		throw bad_json_exception("Expected begin array token", line_number);
 	}
 	++i;
 	while (i->getName() != TokenNames::ArrayEnd)
 	{
-		while (!i.isDone() && (i->getName() == TokenNames::Tab || i->getName() == TokenNames::Spacebar)) { ++i; }
-
+		this->skipWhitespace(i, line_number);
+		
 		if (i->getName() == TokenNames::DoubleQuote)
 		{
 			++i;// skipping double quote
@@ -93,8 +95,7 @@ components::Component * components::ArrayCreator::createComponent(Vector<Token>:
 			++i;
 			if (i->getName() != TokenNames::DoubleQuote)
 			{
-				cout << "Expected double quote" << endl;
-				return result;
+				throw bad_json_exception("Expected double quote", line_number);
 			}
 			++i;// skipping double quote
 		}
@@ -108,22 +109,28 @@ components::Component * components::ArrayCreator::createComponent(Vector<Token>:
 			}
 			catch (const std::invalid_argument &)
 			{
-				cout << "Not a number" << endl;
-				return result;
+				throw bad_json_exception("Error converting to number", line_number);
 			}
 		}
 		else
 		{
-			Component * complex = ComponentFactory::getFactory().createNextFromTokens(i);
+			Component * complex = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
 			if (!complex)
 			{
-				cout << "Error on line n" << endl;
-				return result;
+				throw bad_json_exception("Error parsing json object", line_number);
 			}
 			result->add(complex);
 			++i;
 		}
-		while (!i.isDone() && (i->getName() == TokenNames::Tab || i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Comma)) { ++i; }
+		this->skipWhitespace(i, line_number);
+		if (i->getName() != Comma && i->getName() != ArrayEnd)
+		{
+			throw bad_json_exception("Expected comma or array end token", line_number);
+		}
+		if (i->getName() == TokenNames::Comma && (++i)->getName() == TokenNames::ArrayEnd)
+		{
+			throw bad_json_exception("Unexpected token ','", line_number);
+		}
 	}
 	return result;
 }
