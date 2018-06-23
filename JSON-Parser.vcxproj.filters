@@ -39,12 +39,6 @@
     <ClCompile Include="JSONParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Expression.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Context.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,12 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JSONParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Expression.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ComponentFactory.h">
