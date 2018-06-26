@@ -10,13 +10,11 @@ namespace components
     public:
     	virtual ~Component();
 
-		virtual void print(unsigned short tab_index = 0) const = 0;
-		virtual void print(std::ostream & out, unsigned short tab_index = 0) const = 0;
-
-		virtual Component * operator[](unsigned int index) = 0;
-		virtual const Component * operator[](unsigned int index) const = 0;
-		Component * operator->();
-		Component & operator*();
+		virtual void print(unsigned short tab_index = 0, bool pretty = true) const = 0;
+		virtual void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const = 0;
+		virtual bool operator==(const Component * other) const = 0;
+		virtual bool operator==(const Component & other) const = 0;
+		virtual Component & operator=(Component * other) = 0;
     };
 
 	class ComponentCreator
@@ -26,7 +24,7 @@ namespace components
 		virtual ~ComponentCreator();
 
 		virtual Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const = 0;
-		void skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number) const;
+		static void skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number);
 		const Token & getBeginToken() const;
 		const Token & getEndToken() const;
 	protected:

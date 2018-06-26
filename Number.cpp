@@ -1,9 +1,11 @@
 #include "Number.h"
+#include "String.h"
 #include <iostream>
 #include <math.h>
 
 using std::cout;
 using components::Number;
+using components::String;
 
 const double Number::EPS = 1e-15;
 
@@ -61,6 +63,47 @@ bool components::Number::operator==(const Number & other) const
 	return diff < Number::EPS;
 }
 
+bool components::Number::operator==(const Component * other) const
+{
+	const Number * casted = dynamic_cast<const Number*>(other);
+	if (casted)
+	{
+		return *this == *casted;
+	}
+	return false;
+}
+
+bool components::Number::operator==(const Component & other) const
+{
+	try
+	{
+		const Number & casted = dynamic_cast<const Number&>(other);
+		return *this == casted;
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
+components::Component & components::Number::operator=(Component * other)
+{
+	Number * n = dynamic_cast<Number*>(other);
+	if (n)
+	{
+		*this = *n;
+	}
+	else
+	{
+		String * s = dynamic_cast<String*>(other);
+		if (s)
+		{
+			this->value = std::stod(s->getValue());
+		}
+	}
+	return *this;
+}
+
 Number & components::Number::operator+=(const Number & other)
 {
 	this->value += other.value;
@@ -85,12 +128,12 @@ Number & components::Number::operator/=(const Number & other)
 	return *this;
 }
 
-void components::Number::print(unsigned short tab_index) const
+void components::Number::print(unsigned short tab_index, bool pretty) const
 {
-	print(cout);
+	print(cout, tab_index, pretty);
 }
 
-void components::Number::print(std::ostream & out, unsigned short tab_index) const
+void components::Number::print(std::ostream & out, unsigned short tab_index, bool pretty) const
 {
 	out << value;
 }

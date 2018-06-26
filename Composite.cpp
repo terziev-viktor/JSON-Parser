@@ -2,107 +2,269 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-
 #include "Composite.h"
+#include "JSONParser.h";
+using interpreters::JSONParser;
 using namespace components;
-#include "bad_json_exception.hpp"
+#include "json_exceptions.hpp"
 using json_exceptions::bad_json_exception;
+using json_exceptions::invalid_key_name_exception;
 Composite::Composite()
 {
+}
+
+components::Composite::Composite(const Composite & other)
+{
+	this->leafs = other.leafs;
 }
 
 Composite::~Composite()
 {
 }
 
-void Composite::print(unsigned short tab_index) const
+void Composite::print(unsigned short tab_index, bool pretty) const
 {
-	print(cout, tab_index);
+	print(cout, tab_index, pretty);
 }
 
-void components::Composite::print(std::ostream & out, unsigned short tab_index) const
+void components::Composite::print(std::ostream & out, unsigned short tab_index, bool pretty) const
 {
-	out << "{\n";
-
+	out << '{';
+	if (pretty)
+	{
+		out << endl;
+	}
 	for (size_t i = 0; i < this->leafs.count() - 1; ++i)
 	{
-		for (unsigned short i = 0; i <= tab_index; i++)
+		for (unsigned short i = 0; i <= tab_index && pretty; i++)
 		{
 			out << '\t';
 		}
-		leafs.getAt(i)->print(out, tab_index + 1);
-		out << ',' << endl;
+		this->leafs.getAt(i).print(out, tab_index + 1, pretty);
+		out << ',';
+		if (pretty)
+		{
+			out << endl;
+		}
 	}
-	for (unsigned short i = 0; i <= tab_index; i++)
+	for (unsigned short i = 0; i <= tab_index && pretty; i++)
 	{
 		out << '\t';
 	}
-	leafs.getAt(leafs.count() - 1)->print(out, tab_index + 1);
-	out << endl;
-	for (unsigned short i = 0; i < tab_index; i++)
+	this->leafs.getAt(leafs.count() - 1).print(out, tab_index + 1, pretty);
+	if (pretty)
+	{
+		out << endl;
+	}
+	
+	for (unsigned short i = 0; i < tab_index && pretty; i++)
 	{
 		out << '\t';
 	}
-	out << "}\n";
+	out << '}';
 }
 
-const Leaf * Composite::getLeaf(int at) const
-{
-    return this->leafs.getAt(at);
-}
-
-Leaf * components::Composite::getLeaf(int n)
-{
-	return this->leafs.getAt(n);
-}
-
-const Leaf * components::Composite::getLeaf(const char * name) const
+Leaf & components::Composite::findLeaf(const char * key)
 {
 	for (size_t i = 0; i < this->leafs.count(); i++)
 	{
-		if (strcmp(name, this->leafs.getAt(i)->getName()) == 0)
+		if (strcmp(key, leafs[i].getName()) == 0)
 		{
-			return this->leafs.getAt(i);
+			return leafs[i];
 		}
 	}
-	throw "Invalid name";
+	throw invalid_key_name_exception(key);
 }
 
-Leaf * components::Composite::getLeaf(const char * name)
+bool components::Composite::leafExists(const char * key) const
 {
 	for (size_t i = 0; i < this->leafs.count(); i++)
 	{
-		if (strcmp(name, this->leafs.getAt(i)->getName()) == 0)
+		if (strcmp(key, this->leafs[i].getName()) == 0)
 		{
-			return this->leafs.getAt(i);
+			return true;
 		}
 	}
-	throw "Invalid name";
+	return false;
 }
 
-void Composite::addLeaf(Leaf * child)
+
+const bool components::Composite::hasKey(const char * key) const
 {
-    this->leafs.add(child);
+	return this->leafExists(key);
 }
 
-const Component * components::Composite::operator[](unsigned int n) const
+const Component * components::Composite::get(const char * name) const
 {
-	return this->getLeaf(n);
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(name, this->leafs.getAt(i).getName()) == 0)
+		{
+			return this->leafs.getAt(i).getValue();
+		}
+	}
+	throw invalid_key_name_exception(name);
 }
 
-Component * components::Composite::operator[](unsigned int n)
+Component * components::Composite::get(const char * name)
 {
-	return this->getLeaf(n);
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(name, this->leafs.getAt(i).getName()) == 0)
+		{
+			return this->leafs.getAt(i).getValue();
+		}
+	}
+	throw invalid_key_name_exception(name);
 }
 
-const Leaf * components::Composite::operator[](const char * name) const
+void components::Composite::add(const char * name, const char * value)
 {
-	return this->getLeaf(name);
+	if (this->leafExists(name))
+	{
+		throw invalid_key_name_exception(name);
+	}
+	Leaf * l = new Leaf();
+	l->setName(name);
+	Vector<Token> tokens = Tokenizer::tokenize(value);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	unsigned int line = 1;
+	Component * parsedValue = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	if (parsedValue)
+	{
+		l->setValue(parsedValue);
+	}
+	else
+	{
+		l->setValue(new String(value));
+	}
+	this->leafs.add(*l);
 }
 
-Leaf * components::Composite::operator[](const char * name)
+void components::Composite::add(const Leaf & l)
 {
-	return this->getLeaf(name);
+	if (this->leafExists(l.getName()))
+	{
+		throw invalid_key_name_exception(l.getName());
+	}
+	this->leafs.add(l);
+}
+
+void components::Composite::update(const char * key, const char * json)
+{
+	Leaf & l = this->findLeaf(key);
+	Vector<Token> tokens = Tokenizer::tokenize(json);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	unsigned int line = 1;
+	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	if (parsed)
+	{
+		l.setValue(parsed);
+	}
+	else
+	{
+		l.setValue(new String(json));
+	}
+}
+
+void components::Composite::update(const char * key, double number)
+{
+	Leaf & l = this->findLeaf(key);
+	l.setValue(new Number(number));
+}
+
+void components::Composite::remove(const char * name)
+{
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(this->leafs[i].getName(), name) == 0)
+		{
+			this->leafs.removeAt(i);
+			return;
+		}
+	}
+	throw invalid_key_name_exception(name);
+}
+
+void components::Composite::swap(const char * keyA, const char * keyB)
+{
+	Component * tmp;
+	Leaf a = this->findLeaf(keyA);
+	Leaf b = this->findLeaf(keyB);
+	tmp = a.getValue();
+	a.setValue(b.getValue());
+	b.setValue(tmp);
+}
+
+bool components::Composite::operator==(const Composite & other) const
+{
+	return this->leafs == other.leafs;
+}
+
+Composite & components::Composite::operator+=(const Composite & other)
+{
+	this->leafs += other.leafs;
+	return *this;
+}
+
+Composite & components::Composite::operator=(const Composite & other)
+{
+	this->leafs = other.leafs;
+	return *this;
+}
+
+Component & components::Composite::operator=(Component * other)
+{
+	Composite * c = dynamic_cast<Composite*>(other);
+	if (c)
+	{
+		return (*this = *c);
+	}
+	return *this;
+}
+
+bool components::Composite::operator==(const Component * other) const
+{
+	const Composite * casted = dynamic_cast<const Composite*>(other);
+	if (casted)
+	{
+		return *this == *casted;
+	}
+	return false;
+}
+
+bool components::Composite::operator==(const Component & other) const
+{
+	try
+	{
+		const Composite & casted = dynamic_cast<const Composite&>(other);
+		if (this->leafs.count() != casted.leafs.count())
+		{
+			return false;
+		}
+		for (size_t i = 0; i < this->leafs.count(); i++)
+		{
+			if (!(this->leafs.getAt(i) == casted.leafs.getAt(i)))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
+const Component * components::Composite::operator[](const char * name) const
+{
+	return this->get(name);
+}
+
+Component * components::Composite::operator[](const char * name)
+{
+	return this->get(name);
 }
 
 components::CompositeCreator::CompositeCreator()
@@ -121,7 +283,7 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 	++i; // skipping '{'
 	while (i->getName() != TokenNames::ObjectEnd)
 	{
-		this->skipWhitespace(i, line_number);
+		ComponentCreator::skipWhitespace(i, line_number);
 
 		if (i->getName() != TokenNames::DoubleQuote)
 		{
@@ -136,14 +298,13 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 			throw bad_json_exception("Expected double quote '\"'", line_number);
 		}
 		++i;
-		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
-
+		ComponentCreator::skipWhitespace(i, line_number);
 		if (i->getName() != TokenNames::KeyValSeparator)
 		{
 			throw bad_json_exception("Expected key-value separator ':'", line_number);
 		}
 		++i;
-		while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine) { ++i; } // skipping whipespace
+		ComponentCreator::skipWhitespace(i, line_number);
 		if (i->getName() == TokenNames::DoubleQuote) // the value is a string
 		{
 			++i;
@@ -177,13 +338,18 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 			keyValue->setValue(l);
 			++i;
 		}
-		result->addLeaf(keyValue);
-
-		this->skipWhitespace(i, line_number);
-		if (i->getName() == TokenNames::Comma && (++i)->getName() == TokenNames::ObjectEnd)
+		result->add(*keyValue);
+		ComponentCreator::skipWhitespace(i, line_number);
+		if (i->getName() != TokenNames::Comma)
 		{
-			throw bad_json_exception("Unexpected token ','", line_number);
+			ComponentCreator::skipWhitespace(i, line_number);
+			if (i->getName() != TokenNames::ObjectEnd)
+			{
+				throw bad_json_exception("Expected object end token (or a comma)", line_number);
+			}
+			return result;
 		}
+		++i; // continue building object
 	}
 	return result;
 }

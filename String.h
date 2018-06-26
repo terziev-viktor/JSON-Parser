@@ -26,14 +26,17 @@ namespace components
 		void setValue(const char c);
 		const bool startsWith(const char ch) const;
 
-		// override virtual function
-		void print(unsigned short tab_index = 0) const;
-		void print(std::ostream & out, unsigned short tab_index = 0) const;
+		/*override*/void print(unsigned short tab_index = 0, bool pretty = true) const;
+		/*override*/void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 
 		// Operators
 		String & operator=(const char * other);
 		String & operator=(const char c);
 		String & operator=(const String & other);
+		String & operator=(const string & other);
+		/*override*/Component & operator=(Component * other);
+		/*override*/bool operator==(const Component * other) const;
+		/*override*/bool operator==(const Component & other) const;
 		bool operator==(const String & other) const;
 		bool operator==(const char * other) const;
 		String & operator+=(const String & other);

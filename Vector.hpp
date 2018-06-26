@@ -15,7 +15,18 @@ namespace tools
 		void add(const T & item);
 		const T & getAt(unsigned int index) const;
 		T & getAt(unsigned int index);
+		T & operator[](unsigned int index);
+		const T & operator[](unsigned int index) const;
+		Vector<T> & operator=(const Vector<T> & other);
+		bool operator==(const Vector<T> & other) const;
+		Vector<T> & operator+=(const Vector<T> & other);
+		Vector<T> & operator-=(const T & item);
+		Vector<T> & operator-=(unsigned int count);
+
+		int indexOf(const T & item);
+
 		void removeAt(unsigned int index);
+		void remove(const T & item);
 		const bool isEmpty() const;
 		// sets the index to 0. Does not delete objects
 		void clear();
@@ -189,6 +200,84 @@ namespace tools
 	}
 
 	template<class T>
+	inline T & Vector<T>::operator[](unsigned int index)
+	{
+		return this->getAt(index);
+	}
+
+	template<class T>
+	inline const T & Vector<T>::operator[](unsigned int index) const
+	{
+		return this->getAt(index);
+	}
+
+	template<class T>
+	inline Vector<T>& Vector<T>::operator=(const Vector<T>& other)
+	{
+		this->index = 0;
+		for (size_t i = 0; i < other.index; i++)
+		{
+			this->add(other[i]);
+		}
+		return *this;
+	}
+
+	template<class T>
+	inline bool Vector<T>::operator==(const Vector<T>& other) const
+	{
+		for (size_t i = 0; i < other.index; i++)
+		{
+			if (!(this->buffer[i] == other.buffer[i]))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	template<class T>
+	inline Vector<T>& Vector<T>::operator+=(const Vector<T>& other)
+	{
+		for (size_t i = 0; i < other.count(); i++)
+		{
+			this->add(other[i]);
+		}
+		return *this;
+	}
+
+	template<class T>
+	inline Vector<T>& Vector<T>::operator-=(const T & item)
+	{
+		this->remove(item);
+	}
+
+	template<class T>
+	inline Vector<T>& Vector<T>::operator-=(unsigned int count)
+	{
+		if (count >= this->index)
+		{
+			this->index = 0;
+		}
+		else
+		{
+			this->index -= count;
+		}
+	}
+
+	template<class T>
+	inline int Vector<T>::indexOf(const T & item)
+	{
+		for (unsigned int i = 0; i < this->index; i++)
+		{
+			if (this->buffer[i] == item)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	template<class T>
 	inline void Vector<T>::removeAt(unsigned int at)
 	{
 		if (at < 0 || at >= this->index)
@@ -200,6 +289,17 @@ namespace tools
 			this->buffer[i] = this->buffer[i + 1];
 		}
 		--index;
+	}
+
+	template<class T>
+	inline void Vector<T>::remove(const T & item)
+	{
+		int index = this->indexOf(item);
+		if (index == -1)
+		{
+			throw std::invalid_argument("Item does not exist");
+		}
+		this->removeAt(index);
 	}
 
 	template<class T>

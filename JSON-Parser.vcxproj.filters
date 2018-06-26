@@ -89,7 +89,7 @@
     <ClInclude Include="Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bad_json_exception.hpp">
+    <ClInclude Include="json_exceptions.hpp">
       <Filter>Exceptions</Filter>
     </ClInclude>
   </ItemGroup>

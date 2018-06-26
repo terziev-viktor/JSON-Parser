@@ -54,6 +54,7 @@ class Tokenizer
 {
 public:
 	static Vector<Token> tokenize(const string & str);
+	static Vector<Token> tokenize(const char * str);
 private:
 	Tokenizer();
 };

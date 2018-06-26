@@ -9,16 +9,6 @@ Component::~Component()
 
 }
 
-Component * components::Component::operator->()
-{
-	return this;
-}
-
-Component & components::Component::operator*()
-{
-	return *this;
-}
-
 components::ComponentCreator::ComponentCreator(Token begin, Token end)
 {
 	this->begin = begin;
@@ -30,7 +20,7 @@ components::ComponentCreator::~ComponentCreator()
 {
 }
 
-void components::ComponentCreator::skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number) const
+void components::ComponentCreator::skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number)
 {
 	while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine)
 	{

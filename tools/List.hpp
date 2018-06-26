@@ -24,6 +24,7 @@ namespace tools
 		// I dont return a const item because Fmibook should be able to edit items;
 		const T * getAt(unsigned int index) const;
 		T * getAt(unsigned int index);
+		void setAt(unsigned int index, T * new_item);
 		void removeAt(unsigned int index);
 		const bool isEmpty() const;
 		// sets the index to 0. Does not delete objects
@@ -32,6 +33,8 @@ namespace tools
 		const unsigned int count() const;
 		// operators
 		List<T> & operator=(const List<T> & other);
+		const T * operator[](unsigned int index) const;
+		T * operator[](unsigned int index);
 		operator bool();
 		bool operator !();
 	private:
@@ -103,6 +106,16 @@ namespace tools
 		}
 		return this->buffer[index];
 	}
+
+	template<class T>
+	inline void List<T>::setAt(unsigned int index, T * new_item)
+	{
+		if (index >= 0 && index < this->index)
+		{
+			delete this->buffer[index];
+			this->buffer[index] = new_item;
+		}
+	}
 	
 	template<class T>
 	inline void List<T>::removeAt(unsigned int index)
@@ -154,6 +167,18 @@ namespace tools
 			this->buffer[i] = other.buffer[i];
 		}
 		return *this;
+	}
+
+	template<class T>
+	inline const T * List<T>::operator[](unsigned int index) const
+	{
+		return this->getAt(index);
+	}
+
+	template<class T>
+	inline T * List<T>::operator[](unsigned int index)
+	{
+		return this->getAt(index);
 	}
 
 	template<class T>

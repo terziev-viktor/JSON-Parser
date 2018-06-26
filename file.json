@@ -1,9 +1,7 @@
 {
-    "key1"   :  "string",
-    "key2" : 3.14,
-    "key3" : [1,2,3, "str"],
-    "key5" : { "key4":   3.14, "mile":[69, 69], "kafsf": {"some":"object_batka"}}
-
-
-    
+    "key1" : 3.14,
+    "key5" : 3.14,
+    "key4" : 3.14,
+    "key3" : 3.14,
+    "key2" : 3.14
 }

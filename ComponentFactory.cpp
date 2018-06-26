@@ -1,5 +1,5 @@
 #include "ComponentFactory.h"
-#include "bad_json_exception.hpp"
+#include "json_exceptions.hpp"
 using json_exceptions::bad_json_exception;
 
 factory::ComponentFactory & factory::ComponentFactory::getFactory()
@@ -23,20 +23,13 @@ List<Component> * factory::ComponentFactory::createFromTokens(Vector<Token>::Ite
 	unsigned int line_number = 1;
 	while (!i.isDone())
 	{
-		try
+		ComponentCreator::skipWhitespace(i, line_number);
+		Component * next = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
+		if (next != nullptr)
 		{
-			Component * next = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
-			if (next != nullptr)
-			{
-				result->add(next);
-			}
-			++i;
+			result->add(next);
 		}
-		catch (const bad_json_exception & e)
-		{
-			cout << e.what() << "@ line number " << e.getLineNumber() << endl;
-			//throw;
-		}
+		++i;
 	}
 	return result;
 }

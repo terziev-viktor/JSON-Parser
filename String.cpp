@@ -1,4 +1,5 @@
 #include "String.h"
+#include "Number.h"
 #include <string.h>
 #include <iostream>
 #include <fstream>
@@ -155,12 +156,12 @@ const bool components::String::startsWith(const char ch) const
 	return this->value[0] == ch;
 }
 
-void components::String::print(unsigned short tab_index) const
+void components::String::print(unsigned short tab_index, bool pretty) const
 {
-	print(cout);
+	print(cout, tab_index, pretty);
 }
 
-void components::String::print(std::ostream & out, unsigned short tab_index) const
+void components::String::print(std::ostream & out, unsigned short tab_index, bool pretty) const
 {
 	out << "\"" << this->value << "\"";
 }
@@ -180,6 +181,53 @@ components::String & components::String::operator=(const char c)
 components::String & components::String::operator=(const String & other)
 {
 	this->setValue(other.getValue());
+	return *this;
+}
+
+components::String & components::String::operator=(const string & other)
+{
+	*this = other.c_str();
+	return *this;
+}
+
+bool components::String::operator==(const Component * other) const
+{
+	const String * casted = dynamic_cast<const String*>(other);
+	if (casted)
+	{
+		return *this == *casted;
+	}
+	return false;
+}
+
+bool components::String::operator==(const Component & other) const
+{
+	try
+	{
+		const String & casted = dynamic_cast<const String&>(other);
+		return *this == casted;
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
+components::Component & components::String::operator=(Component * other)
+{
+	String * casted = dynamic_cast<String*>(other);
+	if (casted)
+	{
+		*this = casted->getValue();
+	}
+	else
+	{
+		Number * n = dynamic_cast<Number*>(other);
+		if (n)
+		{
+			*this = std::to_string(n->getValue());
+		}
+	}
 	return *this;
 }
 

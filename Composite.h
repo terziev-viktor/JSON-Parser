@@ -1,13 +1,11 @@
 #pragma once
 #include "Leaf.h"
-#include "tools/List.hpp"
 #include "String.h"
 #include "Number.h"
 #include "ComponentFactory.h"
 using factory::ComponentFactory;
 using components::String;
 using components::Number;
-using namespace tools;
 //using factory::ComponentCreator;
 
 namespace components
@@ -17,25 +15,37 @@ namespace components
     {
     public:
 		Composite();
+		Composite(const Composite & other);
     	~Composite();
-		void print(unsigned short tab_index = 0) const;
-		void print(std::ostream & out, unsigned short tab_index = 0) const;
-		// gets the n'th leaf
-		const Leaf * getLeaf(int n) const;
-		Leaf * getLeaf(int n);
-		// Gets the leaf by name. throws const char * errmsg of the name does not exist
-		const Leaf * getLeaf(const char * name) const;
-		Leaf * getLeaf(const char * name);
-    	void addLeaf(Leaf * child);
+	
+		const bool hasKey(const char * key) const;
+		const Component * get(const char * name) const;
+		Component * get(const char * name);
+		const Component * operator[](const char * name) const;
+		Component * operator[](const char * name);
+		void add(const char * name, const char * value);
+		void add(const Leaf & l);
 
-		const Component * operator[](unsigned int n) const;
-		Component * operator[](unsigned int n);
+		void update(const char * key, const char * json);
 
-		const Leaf * operator[](const char * name) const;
-		Leaf * operator[](const char * name);
+		// !! deletes !! the old value and sets a new one
+		void update(const char * key, double number);
 
+		void remove(const char * key);
+		void swap(const char * keyA, const char * keyB);
+		bool operator==(const Composite & other) const;
+		Composite & operator+=(const Composite & other);
+		Composite & operator=(const Composite & other);
+
+		/*override*/Component & operator=(Component * other);
+		/*override*/bool operator==(const Component * other) const;
+		/*override*/bool operator==(const Component & other) const;
+		/*override*/void print(unsigned short tab_index = 0, bool pretty = true) const;
+		/*override*/void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
     private:
-    	List<Leaf> leafs;
+    	Vector<Leaf> leafs;
+		Leaf & findLeaf(const char * key);
+		bool leafExists(const char * key) const;
     };
 
 	class CompositeCreator : public ComponentCreator
