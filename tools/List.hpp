@@ -27,7 +27,7 @@ namespace tools
 		void setAt(unsigned int index, T * new_item);
 		void removeAt(unsigned int index);
 		const bool isEmpty() const;
-		// sets the index to 0. Does not delete objects
+		// sets the index to 0. Deletes objects
 		void clear();
 		// returns count of elements in the array
 		const unsigned int count() const;

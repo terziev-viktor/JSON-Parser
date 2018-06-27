@@ -73,14 +73,14 @@ const unsigned int interpreters::JSONParser::getParsedCount() const
 	return this->list->count();
 }
 
-const Component & interpreters::JSONParser::operator[](unsigned int index) const
+const Indexable & interpreters::JSONParser::operator[](unsigned int index) const
 {
-	return *this->get(index);
+	return dynamic_cast<const Indexable&>(*this->get(index));
 }
 
-Component & interpreters::JSONParser::operator[](unsigned int index)
+Indexable & interpreters::JSONParser::operator[](unsigned int index)
 {
-	return *this->get(index);
+	return dynamic_cast<Indexable&>(*this->get(index));
 }
 
 void JSONParser::add(Component * component)
@@ -184,29 +184,29 @@ bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool p
 	return true;
 }
 
-Array * interpreters::JSONParser::findAll(const char * key)
-{
-	Array * arr = new Array();
-	for (size_t i = 0; i < this->list->count(); i++)
-	{
-		Composite * c = this->getAsJsonObject(i);
-		if (c && c->hasKey(key))
-		{
-			arr->add(c->get(key));
-		}
-		else
-		{
-			Array * casted = this->getAsJsonArray(i);
-			Component * out;
-			bool contains = casted->contains(key, out);
-			if (casted && contains)
-			{
-				arr->add(out);
-			}
-		}
-	}
-	return arr;
-}
+//Array * interpreters::JSONParser::findAll(const char * key)
+//{
+//	Array * arr = new Array();
+//	for (size_t i = 0; i < this->list->count(); i++)
+//	{
+//		Composite * c = this->getAsJsonObject(i);
+//		if (c && c->hasKey(key))
+//		{
+//			arr->add(c->get(key));
+//		}
+//		else
+//		{
+//			Array * casted = this->getAsJsonArray(i);
+//			Component * out;
+//			bool contains = casted->contains(key, out);
+//			if (casted && contains)
+//			{
+//				arr->add(out);
+//			}
+//		}
+//	}
+//	return arr;
+//}
 
 bool contains(const char * str, int size, const char tocken)
 {

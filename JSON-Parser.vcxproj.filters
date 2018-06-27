@@ -92,5 +92,8 @@
     <ClInclude Include="json_exceptions.hpp">
       <Filter>Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="Indexable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

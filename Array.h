@@ -1,31 +1,21 @@
 #pragma once
 
-#include "Component.h"
+#include "Indexable.h"
 #include "tools\List.hpp"
 using tools::List;
 
 namespace components
 {
-	class Array : public Component
+	class Array : public Indexable
 	{
 	public:
 		Array();
 		Array(const Array & other);
 		~Array();
 
-		// Getters
-		const Component & get(int at) const;
-		Component & get(int at);
-		Component & operator[](unsigned int index);
-		const Component & operator[](unsigned int index) const;
-
 		void add(Component * item);
 		void add(const char * json);
 		void add(double number);
-
-		// Parses the string to json object
-		// Deletes old value and sets new value at given index
-		void update(unsigned int index, const char * json);
 
 		void remove(unsigned int index);
 
@@ -34,15 +24,36 @@ namespace components
 		const bool contains(const char * item, Component *& out) const;
 		
 		Array & operator=(const Array & other);
-		/*overrride*/Component & operator=(Component * other);
 		Array & operator+=(Array & other);
 		Array & operator-=(unsigned int index);
 		bool operator==(const Array & other) const;
 
-		/*override*/bool operator==(const Component * other) const;
-		/*override*/bool operator==(const Component & other) const;
-		/*override*/void print(unsigned short tab_index = 0, bool pretty = true) const;
-		/*override*/void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
+		/*override Indexable*/
+		const Component & get(int index) const;
+		Component & get(int index);
+		const Component & get(const char * key)const;
+		Component & get(const char * key);
+		// updates:
+		void update(const char * key, const char * json);
+		void update(int index, const char * json);
+		void update(int index, double number);
+		void update(const char * key, double number);
+		void update(const char * key, Component * new_value);
+		void update(int index, Component * new_value);
+
+		Indexable & operator[](int index);
+		Indexable & operator[](const char * key);
+		const Indexable & operator[](const char * key) const;
+		const Indexable & operator[](int index) const;
+
+		/*override component*/
+		Component & operator=(const Component * other);
+		Component & operator=(const Component & other);
+		Component * copy() const;
+		bool operator==(const Component * other) const;
+		bool operator==(const Component & other) const;
+		void print(unsigned short tab_index = 0, bool pretty = true) const;
+		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:
 		List<Component> values;
 	};

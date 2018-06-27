@@ -30,6 +30,11 @@ void Composite::print(unsigned short tab_index, bool pretty) const
 void components::Composite::print(std::ostream & out, unsigned short tab_index, bool pretty) const
 {
 	out << '{';
+	if (this->leafs.count() == 0)
+	{
+		out << " }";
+		return;
+	}
 	if (pretty)
 	{
 		out << endl;
@@ -56,7 +61,7 @@ void components::Composite::print(std::ostream & out, unsigned short tab_index, 
 	{
 		out << endl;
 	}
-	
+
 	for (unsigned short i = 0; i < tab_index && pretty; i++)
 	{
 		out << '\t';
@@ -74,6 +79,34 @@ Leaf & components::Composite::findLeaf(const char * key)
 		}
 	}
 	throw invalid_key_name_exception(key);
+}
+
+const Leaf & components::Composite::findLeaf(const char * key) const
+{
+	for (size_t i = 0; i < this->leafs.count(); i++)
+	{
+		if (strcmp(key, leafs[i].getName()) == 0)
+		{
+			return leafs[i];
+		}
+	}
+	throw invalid_key_name_exception(key);
+}
+
+void components::Composite::update(Leaf & l, const char * json)
+{
+	Vector<Token> tokens = Tokenizer::tokenize(json);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	unsigned int line = 1;
+	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	if (parsed)
+	{
+		l.setValue(parsed);
+	}
+	else
+	{
+		l.setValue(new String(json));
+	}
 }
 
 bool components::Composite::leafExists(const char * key) const
@@ -94,28 +127,24 @@ const bool components::Composite::hasKey(const char * key) const
 	return this->leafExists(key);
 }
 
-const Component * components::Composite::get(const char * name) const
+const Component & components::Composite::get(const char * name) const
 {
-	for (size_t i = 0; i < this->leafs.count(); i++)
-	{
-		if (strcmp(name, this->leafs.getAt(i).getName()) == 0)
-		{
-			return this->leafs.getAt(i).getValue();
-		}
-	}
-	throw invalid_key_name_exception(name);
+	return *this->findLeaf(name).getValue();
 }
 
-Component * components::Composite::get(const char * name)
+Component & components::Composite::get(const char * name)
 {
-	for (size_t i = 0; i < this->leafs.count(); i++)
-	{
-		if (strcmp(name, this->leafs.getAt(i).getName()) == 0)
-		{
-			return this->leafs.getAt(i).getValue();
-		}
-	}
-	throw invalid_key_name_exception(name);
+	return *this->findLeaf(name).getValue();
+}
+
+const Component & components::Composite::get(int index) const
+{
+	return *this->leafs.getAt(index).getValue();
+}
+
+Component & components::Composite::get(int index)
+{
+	return *this->leafs.getAt(index).getValue();
 }
 
 void components::Composite::add(const char * name, const char * value)
@@ -153,24 +182,43 @@ void components::Composite::add(const Leaf & l)
 void components::Composite::update(const char * key, const char * json)
 {
 	Leaf & l = this->findLeaf(key);
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
-	unsigned int line = 1;
-	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
-	if (parsed)
+	this->update(l, json);
+}
+
+void components::Composite::update(int index, const char * json)
+{
+	if (index >= 0 && index < this->leafs.count())
 	{
-		l.setValue(parsed);
+		Leaf & l = this->leafs.getAt(index);
+		this->update(l, json);
 	}
-	else
-	{
-		l.setValue(new String(json));
-	}
+	throw invalid_key_name_exception("Invalid index for json key");
+}
+
+void components::Composite::update(int index, double number)
+{
+	this->leafs.getAt(index).setValue(new Number(number));
 }
 
 void components::Composite::update(const char * key, double number)
 {
 	Leaf & l = this->findLeaf(key);
 	l.setValue(new Number(number));
+}
+
+void components::Composite::update(const char * key, Component * new_value)
+{
+	Leaf & l = this->findLeaf(key);
+	l.setValue(new_value);
+}
+
+void components::Composite::update(int index, Component * new_value)
+{
+	if (index >= 0 && index < this->leafs.count())
+	{
+		this->leafs.getAt(index).setValue(new_value);
+	}
+	throw invalid_key_name_exception("Invalid index for json key");
 }
 
 void components::Composite::remove(const char * name)
@@ -213,14 +261,28 @@ Composite & components::Composite::operator=(const Composite & other)
 	return *this;
 }
 
-Component & components::Composite::operator=(Component * other)
+Component & components::Composite::operator=(const Component * other)
 {
-	Composite * c = dynamic_cast<Composite*>(other);
-	if (c)
+	return (*this = *other);
+}
+
+Component & components::Composite::operator=(const Component & other)
+{
+	const Composite & c = dynamic_cast<const Composite&>(other);
+	return (*this = c);
+}
+
+Component * components::Composite::copy() const
+{
+	Composite * c = new Composite();
+	for (size_t i = 0; i < this->leafs.count(); i++)
 	{
-		return (*this = *c);
+		Leaf *l = new Leaf();
+		l->setName(this->leafs.getAt(i).getName());
+		l->setValue(this->leafs.getAt(i).getValue()->copy());
+		c->add(*l);
 	}
-	return *this;
+	return c;
 }
 
 bool components::Composite::operator==(const Component * other) const
@@ -257,14 +319,32 @@ bool components::Composite::operator==(const Component & other) const
 	}
 }
 
-const Component * components::Composite::operator[](const char * name) const
+const Indexable & components::Composite::operator[](const char * key) const
 {
-	return this->get(name);
+	return dynamic_cast<const Indexable&>(this->get(key));
 }
 
-Component * components::Composite::operator[](const char * name)
+Indexable & components::Composite::operator[](const char * key)
 {
-	return this->get(name);
+	return dynamic_cast<Indexable&>(this->get(key));
+}
+
+const Indexable & components::Composite::operator[](int index) const
+{
+	if (index >= 0 && index < this->leafs.count())
+	{
+		return dynamic_cast<const Indexable&>(this->get(index));
+	}
+	throw std::invalid_argument("Invalid key");
+}
+
+Indexable & components::Composite::operator[](int index)
+{
+	if (index >= 0 && index < this->leafs.count())
+	{
+		return dynamic_cast<Indexable&>(this->get(index));
+	}
+	throw std::invalid_argument("Invalid key");
 }
 
 components::CompositeCreator::CompositeCreator()

@@ -1,7 +1,22 @@
 {
     "key1" : 3.14,
-    "key5" : 3.14,
-    "key4" : 3.14,
-    "key3" : 3.14,
-    "key2" : 3.14
+    "key5" : 5.14,
+    "key4" : 6.14,
+    "key3" : 7.14,
+    "key2" : 10.1414
 }
+
+[
+    1,2,3,4,{
+        "key9":"I am awesome",
+        "key10" : "You are awesome"
+    },
+    [3,4]
+]
+
+{
+    "array":[1,2,3,4,{
+        "key9":"I am awesome",
+        "key10" : "You are awesome"
+    },[3,4]]
+ }

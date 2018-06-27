@@ -20,6 +20,7 @@ namespace components
 		void setName(const char * name);
 		void setName(const string & name);
 		void setValue(Component * value);
+		Leaf & operator=(const Leaf & other);
 		bool operator==(const Leaf & other) const;
 		bool operator==(const Component * other) const;
 		Component * operator[](unsigned int index);

@@ -13,7 +13,7 @@ components::String::String()
 	this->capacity = 0;
 }
 
-components::String::String(size_t capacity)
+components::String::String(unsigned int capacity)
 {
 	this->capacity = capacity + 1;
 	this->length = 0;
@@ -66,29 +66,29 @@ const char * components::String::getValue() const
 	return this->value;
 }
 
-const size_t components::String::getLen() const
+const unsigned int components::String::getLen() const
 {
 	return this->length;
 }
 
-components::String components::String::substring(size_t from, size_t to) const
+components::String components::String::substring(unsigned int from, unsigned int to) const
 {
 	if (to < from)
 	{
 		throw std::logic_error("to cannot be before from");
 	}
-	size_t capacity = to - from;
+	unsigned int capacity = to - from;
 	String result(capacity);
-	for (size_t i = from; i < to; i++)
+	for (unsigned int i = from; i < to; i++)
 	{
 		result += this->charAt(i);
 	}
 	return result;
 }
 
-const int components::String::find_first(const char c, size_t start_from) const
+const int components::String::find_first(const char c, unsigned int start_from) const
 {
-	for (int i = start_from; i < this->length; ++i)
+	for (unsigned int i = start_from; i < this->length; ++i)
 	{
 		if (this->value[i] == c)
 		{
@@ -98,10 +98,10 @@ const int components::String::find_first(const char c, size_t start_from) const
 	return -1;
 }
 
-const int components::String::find_first_of(const char * c, size_t start_from) const
+const int components::String::find_first_of(const char * c, unsigned int start_from) const
 {
 	size_t len = strlen(c);
-	for (int i = start_from; i < this->length; ++i)
+	for (unsigned int i = start_from; i < this->length; ++i)
 	{
 		for (size_t j = 0; j < len; ++j)
 		{
@@ -174,14 +174,12 @@ components::String & components::String::operator=(const char * other)
 
 components::String & components::String::operator=(const char c)
 {
-	this->setValue(c);
-	return *this;
+	return *this = &c;
 }
 
 components::String & components::String::operator=(const String & other)
 {
-	this->setValue(other.getValue());
-	return *this;
+	return *this = other.getValue();
 }
 
 components::String & components::String::operator=(const string & other)
@@ -190,14 +188,14 @@ components::String & components::String::operator=(const string & other)
 	return *this;
 }
 
+components::Component * components::String::copy() const
+{
+	return new String(*this);
+}
+
 bool components::String::operator==(const Component * other) const
 {
-	const String * casted = dynamic_cast<const String*>(other);
-	if (casted)
-	{
-		return *this == *casted;
-	}
-	return false;
+	return *this == *other;
 }
 
 bool components::String::operator==(const Component & other) const
@@ -213,43 +211,20 @@ bool components::String::operator==(const Component & other) const
 	}
 }
 
-components::Component & components::String::operator=(Component * other)
+components::Component & components::String::operator=(const Component * other)
 {
-	String * casted = dynamic_cast<String*>(other);
-	if (casted)
-	{
-		*this = casted->getValue();
-	}
-	else
-	{
-		Number * n = dynamic_cast<Number*>(other);
-		if (n)
-		{
-			*this = std::to_string(n->getValue());
-		}
-	}
-	return *this;
+	return (*this = *other);
+}
+
+components::Component & components::String::operator=(const Component & other)
+{
+	const String & str = dynamic_cast<const String&>(other);
+	return (*this = str.getValue());
 }
 
 bool components::String::operator==(const String & other) const
 {
-	const size_t thisLen = this->getLen();
-	const size_t otherLen = other.getLen();
-
-	if (thisLen != otherLen)
-	{
-		return false;
-	}
-	const char * otherVal = other.getValue();
-
-	for (size_t i = 0; i < thisLen; i++)
-	{
-		if (this->value[i] != otherVal[i])
-		{
-			return false;
-		}
-	}
-	return true;
+	return *this == other.getValue();
 }
 
 bool components::String::operator==(const char * other) const
@@ -270,30 +245,7 @@ bool components::String::operator==(const char * other) const
 
 components::String & components::String::operator+=(const String & other)
 {
-	const size_t thisLen = this->getLen();
-	const size_t otherLen = other.getLen();
-
-	size_t new_capacity = thisLen + otherLen + 1;
-	char * newValue = new char[new_capacity];
-	size_t index = 0;
-	for (size_t i = 0; i < thisLen; i++)
-	{
-		newValue[index] = this->value[i];
-		index++;
-	}
-
-	for (size_t i = 0; i < otherLen; i++)
-	{
-		newValue[index] = other.value[i];
-		index++;
-	}
-	newValue[index] = '\0';
-
-	delete[] this->value;
-	this->value = newValue;
-	this->capacity = new_capacity;
-	this->length = new_capacity - 1;
-	return *this;
+	return (*this += other.getValue());
 }
 
 components::String & components::String::operator+=(const char * other)
@@ -330,34 +282,31 @@ components::String & components::String::operator+=(const char ch)
 		this->value[this->length] = ch;
 		this->value[this->length + 1] = '\0';
 		++this->length;
+		return *this;
 	}
 	else
 	{
-		char * new_buffer = new char[this->capacity + 1];
-		this->capacity += 1;
-		for (size_t i = 0; i < this->length; i++)
-		{
-			new_buffer[i] = this->value[i];
-		}
-		new_buffer[this->length] = ch;
-		new_buffer[this->length + 1] = '\0';
-		++this->length;
+		return *this += &ch;
 	}
-	return *this;
+	
 }
 
-const components::Component * components::String::operator[](unsigned int index) const
+const char components::String::operator[](unsigned int index) const
 {
-	return new String(this->charAt(index));
+	if (index >= 0 && index <= this->length)
+	{
+		return this->value[index];
+	}
+	throw std::out_of_range("Index out of range");
 }
 
-components::Component * components::String::operator[](unsigned int index)
+char components::String::operator[](unsigned int index)
 {
 	if (index < 0 || index >= this->length)
 	{
-		throw std::out_of_range("Index out of range");
+		return this->value[index];
 	}
-	return new String(this->value[index]);
+	throw std::out_of_range("Index out of range");
 }
 
 std::ostream & components::operator<<(std::ostream & os, const String & obj)

@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Indexable.h" />
     <ClInclude Include="json_exceptions.hpp" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />

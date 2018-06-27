@@ -4,11 +4,6 @@
 using components::Component;
 #include <string>
 
-Component::~Component()
-{
-
-}
-
 components::ComponentCreator::ComponentCreator(Token begin, Token end)
 {
 	this->begin = begin;

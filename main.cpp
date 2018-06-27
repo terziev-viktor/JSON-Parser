@@ -8,17 +8,24 @@ using interpreters::JSONParser;
 
 int main()
 {
-	Composite *a = new Composite();
-	a->add("a", "bbb");
-	Composite * b = new Composite();
-	b->add("b", "bbbb");
-	b->add("c", "bbbb");
-	b->add("d", "bbbb");
-	b->add("e", "bbbb");
-	*a = b;
-	a->print();
-	b->print();
-	delete a;
-	delete b;
+	JSONParser parser;
+	parser.load("file.json");
+	
+	try
+	{
+		parser.parse();
+
+		parser[2].print();
+		parser[2]["array"].update(0, "[1.2,3,4,5]");
+		cout << endl;
+		parser[2].print();
+
+	}
+	catch (const bad_json_exception& e)
+	{
+		cout << e.what() << " @ line " << e.get_line_number() << endl;
+	}
+	
+
 	return 0;
 }

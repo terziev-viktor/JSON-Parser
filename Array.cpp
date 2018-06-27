@@ -8,10 +8,9 @@ using std::cout;
 #include "String.h"
 #include "ComponentFactory.h"
 #include "json_exceptions.hpp"
-#include "JSONParser.h"
-using interpreters::JSONParser;
 using json_exceptions::bad_json_exception;
-
+using json_exceptions::invalid_key_name_exception;
+using namespace components;
 using factory::ComponentFactory;
 
 components::Array::Array()
@@ -36,6 +35,68 @@ const components::Component & components::Array::get(int index) const
 Component & components::Array::get(int at)
 {
 	return *this->values.getAt(at);
+}
+
+const Component & components::Array::get(const char * key) const
+{
+	int parsed;
+	if (Number::tryParse(key, parsed))
+	{
+		return *this->values.getAt(parsed);
+	}
+	throw std::invalid_argument("Invalid array index");
+}
+
+Component & components::Array::get(const char * key)
+{
+	int parsed;
+	if (Number::tryParse(key, parsed))
+	{
+		return *this->values.getAt(parsed);
+	}
+	throw std::invalid_argument("Invalid array index");
+}
+
+void components::Array::update(const char * key, const char * json)
+{
+	int index;
+	bool success = Number::tryParse(key, index);
+	if (!success)
+	{
+		throw invalid_key_name_exception("Invalid key for array index");
+	}
+	this->update(index, json);
+}
+
+void components::Array::update(int index, const char * json)
+{
+	Vector<Token> tokens = Tokenizer::tokenize(json);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	unsigned int line = 1;
+	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
+
+	if (parsed)
+	{
+		this->update(index, parsed);
+	}
+	else
+	{
+		int n;
+		if (Number::tryParse(json, n))
+		{
+			this->update(index, new Number(n));
+		}
+		else
+		{
+			this->update(index, new String(json));
+		}
+	}
+}
+
+void components::Array::update(int index, double number)
+{
+	Number *n = new Number();
+	this->update(index, n);
 }
 
 void components::Array::add(Component * item)
@@ -64,21 +125,6 @@ void components::Array::add(double number)
 	this->values.add(new Number(number));
 }
 
-void components::Array::update(unsigned int index, const char * json)
-{
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
-	unsigned int line = 1;
-	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
-	if (parsed)
-	{
-		this->values.setAt(index, parsed);
-	}
-	else // treating it as a string
-	{
-		this->values.setAt(index, new String(json));
-	}
-}
 
 void components::Array::remove(unsigned int index)
 {
@@ -118,29 +164,37 @@ const bool components::Array::contains(const char * item, Component *& out) cons
 	return false;
 }
 
-components::Component & components::Array::operator[](unsigned int index)
-{
-	return this->get(index);
-}
-
-const components::Component & components::Array::operator[](unsigned int index) const
-{
-	return this->get(index);
-}
 Array & components::Array::operator=(const Array & other)
 {
-	this->values = other.values;
-	return *this;
-}
-Component & components::Array::operator=(Component * other)
-{
-	Array * arr = dynamic_cast<Array*>(other);
-	if (arr)
+	this->values.clear();
+	for (size_t i = 0; i < other.size(); i++)
 	{
-		return *this = *arr;
+		this->values.add(other.get(i).copy());
 	}
 	return *this;
 }
+
+Component & components::Array::operator=(const Component * other)
+{
+	return *this = *other;
+}
+
+Component & components::Array::operator=(const Component & other)
+{
+	const Array & casted = dynamic_cast<const Array&>(other);
+	return *this = casted;
+}
+
+Component * components::Array::copy() const
+{
+	Array * arr = new Array();
+	for (size_t i = 0; i < this->values.count(); i++)
+	{
+		arr->add(this->values.getAt(i)->copy());
+	}
+	return arr;
+}
+
 Array & components::Array::operator+=(Array & other)
 {
 	for (size_t i = 0; i < other.values.count(); i++)
@@ -156,12 +210,7 @@ Array & components::Array::operator-=(unsigned int index)
 }
 bool components::Array::operator==(const Component * other) const
 {
-	const Array * cast = dynamic_cast<const Array*>(other);
-	if (cast)
-	{
-		return *this == *cast;
-	}
-	return false;
+	return *this == *other;
 }
 
 bool components::Array::operator==(const Component & other) const
@@ -190,6 +239,48 @@ bool components::Array::operator==(const Array & other) const
 			return false;
 		}
 	}
+}
+
+void components::Array::update(const char * key, double number)
+{
+	int n;
+	if (Number::tryParse(key, n))
+	{
+		this->update(n, number);
+		return;
+	}
+	throw invalid_key_name_exception("Invalid key for array index");
+}
+
+void components::Array::update(const char * key, Component * new_value)
+{
+	int n;
+	if (Number::tryParse(key, n))
+	{
+		this->update(n, new_value);
+	}
+	throw invalid_key_name_exception("Invalid key for array index");
+}
+
+void components::Array::update(int index, Component * new_value)
+{
+	this->values.setAt(index, new_value);
+}
+Indexable & components::Array::operator[](int index)
+{
+	return dynamic_cast<Indexable&>(this->get(index));
+}
+Indexable & components::Array::operator[](const char * key)
+{
+	return dynamic_cast<Indexable&>(this->get(key));
+}
+const Indexable & components::Array::operator[](const char * key) const
+{
+	return dynamic_cast<const Indexable&>(this->get(key));
+}
+const Indexable & components::Array::operator[](int index) const
+{
+	return dynamic_cast<const Indexable&>(this->get(index));
 }
 // override
 

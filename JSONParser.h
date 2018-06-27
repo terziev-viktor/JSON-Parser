@@ -32,7 +32,7 @@ namespace interpreters
 
 		// Finds all keys in json objects and all strings or numbers in arrays
 		// returns array of their values
-		Array * findAll(const char * key);
+		//Array * findAll(const char * key);
 
 		// getters
 		const Component * get(unsigned int index) const;
@@ -41,8 +41,8 @@ namespace interpreters
 		const Composite * getAsJsonObject(unsigned int index) const;
 		Array * getAsJsonArray(unsigned int index);
 		const Array * getAsJsonArray(unsigned int index) const;
-		const Component & operator[](unsigned int index) const;
-		Component & operator[](unsigned int index);
+		const Indexable & operator[](unsigned int index) const;
+		Indexable & operator[](unsigned int index);
 
 		// Count of currently parsed elements
 		const unsigned int getParsedCount() const;

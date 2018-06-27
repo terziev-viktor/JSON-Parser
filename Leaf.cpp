@@ -81,9 +81,16 @@ void components::Leaf::setValue(Component * value)
 	this->value = value;
 }
 
+Leaf & components::Leaf::operator=(const Leaf & other)
+{
+	this->setName(other.name);
+	this->setValue(other.value->copy());
+	return *this;
+}
+
 bool components::Leaf::operator==(const Leaf & other) const
 {
-	return this->value == other.value;
+	return *this->value == *other.value;
 }
 
 bool components::Leaf::operator==(const Component * other) const

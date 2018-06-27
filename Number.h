@@ -11,10 +11,12 @@ namespace components
 	{
 	public:
 		Number();
+		Number(const Number & other);
 		Number(const string & str);
 		Number(const double v);
 		~Number();
 		static const double EPS;
+		static bool tryParse(const char * str, int & out);
 
 		void setValue(double v);
 		const double getValue() const;
@@ -26,16 +28,15 @@ namespace components
 		bool operator==(const Number & other) const;
 		/*override*/bool operator==(const Component * other) const;
 		/*override*/bool operator==(const Component & other) const;
-		/*override*/Component & operator=(Component * other);
+		/*override*/Component & operator=(const Component * other);
+		/*override*/Component & operator=(const Component & other);
+		/*override*/Component * copy() const;
 		Number & operator+=(const Number & other);
 		Number & operator-=(const Number & other);
 		Number & operator*=(const Number & other);
 		Number & operator/=(const Number & other);
 		/*override*/void print(unsigned short tab_index = 0, bool pretty = true) const;
 		/*override*/void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
-
-		Component * operator[](unsigned int index);
-		const Component * operator[](unsigned int index) const;
 	private:
 		double value;
 		
