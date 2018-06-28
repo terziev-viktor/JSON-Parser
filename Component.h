@@ -14,8 +14,11 @@ namespace components
 		virtual void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const = 0;
 		virtual bool operator==(const Component * other) const = 0;
 		virtual bool operator==(const Component & other) const = 0;
+		virtual bool operator!=(const Component & other) const = 0;
+		virtual bool operator!=(const Component * other) const = 0;
 		virtual Component & operator=(const Component * other) = 0;
 		virtual Component & operator=(const Component & other) = 0;
+		virtual Component & operator+=(const Component & other) = 0;
 		virtual Component * copy() const = 0;
     };
 
@@ -32,6 +35,5 @@ namespace components
 	protected:
 		Token begin;
 		Token end;
-
 	};
 } // components

@@ -34,16 +34,21 @@ namespace components
 		String & operator=(const char c);
 		String & operator=(const String & other);
 		String & operator=(const string & other);
-		/*override*/Component & operator=(const Component * other);
-		/*override*/Component & operator=(const Component & other);
-		/*override*/Component * copy() const;
-		/*override*/bool operator==(const Component * other) const;
-		/*override*/bool operator==(const Component & other) const;
-		bool operator==(const String & other) const;
-		bool operator==(const char * other) const;
 		String & operator+=(const String & other);
 		String & operator+=(const char * other);
 		String & operator+=(const char ch);
+		/*override Component*/
+		Component & operator=(const Component * other);
+		Component & operator=(const Component & other);
+		Component & operator+=(const Component & other);
+		Component * copy() const;
+		bool operator==(const Component * other) const;
+		bool operator==(const Component & other) const;
+		bool operator!=(const Component * other) const;
+		bool operator!=(const Component & other) const;
+		bool operator==(const String & other) const;
+		bool operator==(const char * other) const;
+		
 		const char operator[](unsigned int index) const;
 		char operator[](unsigned int index);
 	private:

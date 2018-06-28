@@ -86,13 +86,13 @@
     <ClInclude Include="Vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Stack.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="json_exceptions.hpp">
       <Filter>Exceptions</Filter>
     </ClInclude>
     <ClInclude Include="Indexable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Modifiable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

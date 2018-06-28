@@ -120,7 +120,7 @@ namespace tools
 	template<class T>
 	inline void List<T>::removeAt(unsigned int index)
 	{
-		if (this->index >= this->size)
+		if (index >= this->size)
 		{
 			throw std::out_of_range("Index of of range.");
 		}

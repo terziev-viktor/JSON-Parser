@@ -26,17 +26,21 @@ namespace components
 		bool operator<(const Number & other) const;
 		bool operator>(const Number & other) const;
 		bool operator==(const Number & other) const;
-		/*override*/bool operator==(const Component * other) const;
-		/*override*/bool operator==(const Component & other) const;
-		/*override*/Component & operator=(const Component * other);
-		/*override*/Component & operator=(const Component & other);
-		/*override*/Component * copy() const;
 		Number & operator+=(const Number & other);
 		Number & operator-=(const Number & other);
 		Number & operator*=(const Number & other);
 		Number & operator/=(const Number & other);
-		/*override*/void print(unsigned short tab_index = 0, bool pretty = true) const;
-		/*override*/void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
+		/*override Component*/
+		bool operator==(const Component * other) const;
+		bool operator==(const Component & other) const;
+		bool operator!=(const Component * other) const;
+		bool operator!=(const Component & other) const;
+		Component & operator=(const Component * other);
+		Component & operator=(const Component & other);
+		Component & operator+=(const Component & other);
+		Component * copy() const;
+		void print(unsigned short tab_index = 0, bool pretty = true) const;
+		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:
 		double value;
 		

@@ -8,10 +8,13 @@ using std::cout;
 #include "String.h"
 #include "ComponentFactory.h"
 #include "json_exceptions.hpp"
+#include <cstdarg>
 using json_exceptions::bad_json_exception;
 using json_exceptions::invalid_key_name_exception;
 using namespace components;
 using factory::ComponentFactory;
+
+static const ArrayCreator theArrayCreator;
 
 components::Array::Array()
 {
@@ -55,6 +58,17 @@ Component & components::Array::get(const char * key)
 		return *this->values.getAt(parsed);
 	}
 	throw std::invalid_argument("Invalid array index");
+}
+
+Indexable & components::Array::operator=(const Indexable * other)
+{
+	return *this = *other;
+}
+
+Indexable & components::Array::operator=(const Indexable & other)
+{
+	const Array & casted = dynamic_cast<const Array &>(other);
+	return (*this = casted);
 }
 
 void components::Array::update(const char * key, const char * json)
@@ -114,21 +128,24 @@ void components::Array::add(const char * json)
 	{
 		this->values.add(parsed);
 	}
-	else // treating it as a string
+	else
 	{
-		this->values.add(new String(json));
+		try
+		{
+			Number * n = new Number(json);
+			this->values.add(n);
+		}
+		catch (const std::exception& e)
+		{
+			this->values.add(new String(json));
+		}
+		
 	}
 }
 
 void components::Array::add(double number)
 {
 	this->values.add(new Number(number));
-}
-
-
-void components::Array::remove(unsigned int index)
-{
-	this->values.removeAt(index);
 }
 
 const unsigned int components::Array::size() const
@@ -185,6 +202,12 @@ Component & components::Array::operator=(const Component & other)
 	return *this = casted;
 }
 
+Component & components::Array::operator+=(const Component & other)
+{
+	const Array & casted = dynamic_cast<const Array &>(other);
+	return (*this += casted);
+}
+
 Component * components::Array::copy() const
 {
 	Array * arr = new Array();
@@ -195,11 +218,11 @@ Component * components::Array::copy() const
 	return arr;
 }
 
-Array & components::Array::operator+=(Array & other)
+Array & components::Array::operator+=(const Array & other)
 {
 	for (size_t i = 0; i < other.values.count(); i++)
 	{
-		this->values.add(other.values.getAt(i));
+		this->values.add(other.values.getAt(i)->copy());
 	}
 	return *this;
 }
@@ -226,6 +249,16 @@ bool components::Array::operator==(const Component & other) const
 	}
 }
 
+bool components::Array::operator!=(const Component & other) const
+{
+	return !(*this == other);
+}
+
+bool components::Array::operator!=(const Component * other) const
+{
+	return *this != *other;
+}
+
 bool components::Array::operator==(const Array & other) const
 {
 	if (this->values.count() != other.values.count())
@@ -239,6 +272,22 @@ bool components::Array::operator==(const Array & other) const
 			return false;
 		}
 	}
+	return true;
+}
+
+void components::Array::add(unsigned int items_count, ...)
+{
+	va_list args;
+	va_start(args, items_count);
+	for (size_t i = 0; i < items_count; i++)
+	{
+		const char * next_json = va_arg(args, const char *);
+		if (next_json[0])
+		{
+			this->add(next_json);
+		}
+	}
+	va_end(args);
 }
 
 void components::Array::update(const char * key, double number)
@@ -266,6 +315,31 @@ void components::Array::update(int index, Component * new_value)
 {
 	this->values.setAt(index, new_value);
 }
+void components::Array::remove(const char * index)
+{
+	int n;
+	if (Number::tryParse(index, n))
+	{
+		this->remove(n);
+	}
+	else
+	{
+		throw invalid_key_name_exception("Invalid key for array index");
+	}
+
+}
+void components::Array::remove(int index)
+{
+	if (index >= 0)
+	{
+		this->values.removeAt(index);
+	}
+	else
+	{
+		throw std::out_of_range("Index out of rande");
+	}
+}
+
 Indexable & components::Array::operator[](int index)
 {
 	return dynamic_cast<Indexable&>(this->get(index));

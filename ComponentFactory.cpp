@@ -24,6 +24,7 @@ List<Component> * factory::ComponentFactory::createFromTokens(Vector<Token>::Ite
 	while (!i.isDone())
 	{
 		ComponentCreator::skipWhitespace(i, line_number);
+		unsigned int old = line_number;
 		Component * next = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
 		if (next != nullptr)
 		{

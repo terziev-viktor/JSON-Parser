@@ -5,6 +5,8 @@ using interpreters::JSONParser;
 // This is a .NET solution
 // I'm using the Composite OOP Design Pattern
 // Source::https://www.oodesign.com/composite-pattern.html
+// Abstract Factory OOP Design Pattern
+// Source::https://learn.fmi.uni-sofia.bg/mod/folder/view.php?id=100016
 
 int main()
 {
@@ -14,14 +16,14 @@ int main()
 	try
 	{
 		parser.parse();
-
-		parser[2].print();
-		parser[2]["array"].update(0, "[1.2,3,4,5]");
+		for (size_t i = 0; i < parser.getParsedCount(); i++)
+		{
+			parser[i].print();
+			cout << endl;
+		}
 		cout << endl;
-		parser[2].print();
-
 	}
-	catch (const bad_json_exception& e)
+	catch (const json_exceptions::bad_json_exception & e)
 	{
 		cout << e.what() << " @ line " << e.get_line_number() << endl;
 	}

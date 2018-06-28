@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Modifiable.h" />
     <ClInclude Include="Indexable.h" />
     <ClInclude Include="json_exceptions.hpp" />
     <ClInclude Include="Component.h" />
@@ -125,7 +126,6 @@
     <ClInclude Include="JSONParser.h" />
     <ClInclude Include="Leaf.h" />
     <ClInclude Include="Number.h" />
-    <ClInclude Include="Stack.hpp" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Tokenizer.h" />
     <ClInclude Include="tools\DynamicArray.hpp" />

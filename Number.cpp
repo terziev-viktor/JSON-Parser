@@ -106,6 +106,16 @@ bool components::Number::operator==(const Component & other) const
 	}
 }
 
+bool components::Number::operator!=(const Component * other) const
+{
+	return *this != *other;
+}
+
+bool components::Number::operator!=(const Component & other) const
+{
+	return !(*this == other);
+}
+
 components::Component & components::Number::operator=(const Component * other)
 {
 	return *this = *other;
@@ -115,6 +125,12 @@ components::Component & components::Number::operator=(const Component & other)
 {
 	const Number & n = dynamic_cast<const Number&>(other);
 	return *this = n;
+}
+
+components::Component & components::Number::operator+=(const Component & other)
+{
+	const Number & casted = dynamic_cast<const Number &>(other);
+	return (*this += casted);
 }
 
 components::Component * components::Number::copy() const

@@ -1,9 +1,9 @@
 #pragma once
-#include "Component.h"
+#include "Modifiable.h"
 
 namespace components
 {
-	class Indexable : public Component
+	class Indexable : public Component, public Modifiable
 	{
 	public:
 		virtual ~Indexable() = default;
@@ -20,12 +20,8 @@ namespace components
 		virtual const Component & get(int index) const = 0;
 		virtual const Component & get(const char * key) const = 0;
 
-		virtual void update(const char * key, const char * json) = 0;
-		virtual void update(int index, const char * json) = 0;
-		virtual void update(int index, double number) = 0;
-		virtual void update(const char * key, double number) = 0;
-		virtual void update(const char * key, Component * new_value) = 0;
-		virtual void update(int index, Component * new_value) = 0;
+		virtual Indexable & operator=(const Indexable * other) = 0;
+		virtual Indexable & operator=(const Indexable & other) = 0;
 	};
 
 

@@ -211,6 +211,16 @@ bool components::String::operator==(const Component & other) const
 	}
 }
 
+bool components::String::operator!=(const Component * other) const
+{
+	return !(*this == *other);
+}
+
+bool components::String::operator!=(const Component & other) const
+{
+	return !(*this == other);
+}
+
 components::Component & components::String::operator=(const Component * other)
 {
 	return (*this = *other);
@@ -220,6 +230,12 @@ components::Component & components::String::operator=(const Component & other)
 {
 	const String & str = dynamic_cast<const String&>(other);
 	return (*this = str.getValue());
+}
+
+components::Component & components::String::operator+=(const Component & other)
+{
+	const String & casted = dynamic_cast<const String&>(other);
+	return (*this += casted);
 }
 
 bool components::String::operator==(const String & other) const
