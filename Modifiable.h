@@ -7,7 +7,7 @@ namespace components
 	{
 	public:
 		virtual void add(unsigned int n, ...) = 0;
-		//these methods is only for the sake of the demo. Normally I would put it in Array only, because it has no meaning in a composite object
+		//these methods are only for the sake of the demo. Normally I would put it in Array only, because it has no meaning in a composite object
 		virtual void add(const char * item) = 0;
 		virtual void add(const char * key, const char * value) = 0;
 
@@ -21,5 +21,7 @@ namespace components
 		virtual void remove(const char * key) = 0;
 		virtual void remove(int index) = 0;
 
+		virtual void swap(const char * key1, const char * key2) = 0;
+		virtual void swap(unsigned int index1, unsigned int index2) = 0;
 	};
 }

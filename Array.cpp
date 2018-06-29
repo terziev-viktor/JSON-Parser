@@ -23,7 +23,13 @@ components::Array::Array()
 
 components::Array::Array(const Array & other)
 {
-	this->values = other.values;
+	this->copyFrom(other);
+}
+
+components::Array::Array(const Indexable & other)
+{
+	const Array & casted = dynamic_cast<const Array &>(other);
+	this->copyFrom(casted);
 }
 
 components::Array::~Array()
@@ -143,11 +149,6 @@ void components::Array::add(const char * json1, const char * json2)
 	this->add(json2);
 }
 
-void components::Array::add(double number)
-{
-	this->values.add(new Number(number));
-}
-
 const unsigned int components::Array::size() const
 {
 	return this->values.count();
@@ -158,16 +159,19 @@ const bool components::Array::empty() const
 	return this->size() == 0;
 }
 
-const bool components::Array::contains(const char * item, Component *& out) const
+const bool components::Array::contains(const char * item, Component * out) const
 {
-	Component * parsed;
-	try
+	Component * parsed = JSONParser::parseOne(item);
+	if (!parsed)
 	{
-		parsed = new Number(item);
-	}
-	catch (const std::exception&)
-	{
-		parsed = new String(item);
+		try
+		{
+			parsed = new Number(item);
+		}
+		catch (const std::exception&)
+		{
+			parsed = new String(item);
+		}
 	}
 	for (size_t i = 0; i < this->values.count(); i++)
 	{
@@ -257,7 +261,7 @@ bool components::Array::operator==(const Array & other) const
 	}
 	for (size_t i = 0; i < this->values.count(); i++)
 	{
-		if (!(this->values.getAt(i) == other.values.getAt(i)))
+		if (!(*this->values.getAt(i) == *other.values.getAt(i)))
 		{
 			return false;
 		}
@@ -330,6 +334,24 @@ void components::Array::remove(int index)
 	}
 }
 
+void components::Array::swap(const char * key1, const char * key2)
+{
+	int index1, index2;
+	if (Number::tryParse(key1, index1) && Number::tryParse(key2, index2))
+	{
+		this->swap(index1, index2);
+	}
+	throw invalid_key_name_exception("invalid keys for swap function");
+}
+
+void components::Array::swap(unsigned int index1, unsigned int index2)
+{
+	Component * a = this->values.getAt(index1);
+	Component * b = this->values.getAt(index2);
+	this->values.setAt(index1, b, false);
+	this->values.setAt(index2, a, false);
+}
+
 Indexable & components::Array::operator[](int index)
 {
 	return dynamic_cast<Indexable&>(this->get(index));
@@ -362,6 +384,14 @@ void components::Array::print(std::ostream & out, unsigned short tab_index, bool
 		this->values[this->values.count() - 1]->print(out, tab_index, pretty);
 	}
 	out << ']';
+}
+void components::Array::copyFrom(const Array & other)
+{
+	this->values.clear();
+	for (size_t i = 0; i < other.values.count(); i++)
+	{
+		this->values.add(other.values.getAt(i)->copy());
+	}
 }
 void components::Array::print(unsigned short tab_index, bool pretty) const
 {
@@ -443,4 +473,10 @@ components::Component * components::ArrayCreator::createComponent(Vector<Token>:
 		}
 	}
 	return result;
+}
+
+Array components::operator+(const Array & left, const Array & right)
+{
+
+	return Array(left) += right;
 }

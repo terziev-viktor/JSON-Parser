@@ -245,6 +245,14 @@ bool components::String::operator==(const String & other) const
 	return *this == other.getValue();
 }
 
+bool components::String::operator==(const char c) const
+{
+	char str[2];
+	str[0] = c;
+	str[1] = '\0';
+	return *this == str;
+}
+
 bool components::String::operator==(const char * other) const
 {
 	if (strlen(other) != this->getLen())
@@ -259,6 +267,11 @@ bool components::String::operator==(const char * other) const
 		}
 	}
 	return true;
+}
+
+const unsigned int components::String::size() const
+{
+	return this->getLen();
 }
 
 components::String & components::String::operator+=(const String & other)

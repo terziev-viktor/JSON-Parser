@@ -32,6 +32,7 @@ class Token
 {
 public:
 	Token();
+	Token(const Token & other);
 	~Token();
 	Token(TokenNames name, const char * value);
 	Token(TokenNames name, const char ch);

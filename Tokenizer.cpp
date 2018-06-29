@@ -131,6 +131,12 @@ Token::Token()
 {
 }
 
+Token::Token(const Token & other)
+{
+	this->value = other.getValue();
+	this->name = other.getName();
+}
+
 Token::~Token()
 {
 

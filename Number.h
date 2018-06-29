@@ -35,6 +35,7 @@ namespace components
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
+		const unsigned int size() const;
 		void print(unsigned short tab_index = 0, bool pretty = true) const;
 		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:

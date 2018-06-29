@@ -16,6 +16,11 @@ JSONParser::~JSONParser()
 	delete this->list;
 }
 
+Indexable * interpreters::JSONParser::findAll(const char * key, const Indexable & obj)
+{
+	return nullptr;
+}
+
 const Component * JSONParser::get(unsigned int index) const
 {
 	return this->list->getAt(index);
@@ -71,7 +76,7 @@ const string & interpreters::JSONParser::getFile() const
 	return this->file;
 }
 
-bool interpreters::JSONParser::fileExists(const char * path)
+bool interpreters::JSONParser::fileExists(const char * path) const
 {
 	std::ifstream f;
 	f.open(path);
@@ -145,7 +150,20 @@ bool interpreters::JSONParser::load(const char * path)
 	return true;
 }
 
-bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool pretty)
+bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool pretty) const
+{
+	for (size_t i = 0; i < this->list->count(); i++)
+	{
+		bool success = this->save(this->list->getAt(i), path, false, pretty);
+		if (!success)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool interpreters::JSONParser::save(const Component * item, const char * path, bool overrideFile, bool pretty) const
 {
 	size_t len = strlen(path);
 	if (path[len - 1] != 'n' || path[len - 2] != 'o' || path[len - 3] != 's' || path[len - 4] != 'j' || path[len - 5] != '.')
@@ -153,23 +171,22 @@ bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool p
 		throw json_exception("path must be .json file");
 		return false;
 	}
-	if (!overrideFile && this->fileExists(path))
-	{
-		throw json_exception("File already exists. Set <overrideFile> parameter to true if you wish to override it");
-		return false;
-	}
 	std::ofstream jsonFile;
-	jsonFile.open(path);
-	
+	if (overrideFile)
+	{
+		jsonFile.open(path);
+	}
+	else
+	{
+		jsonFile.open(path, std::ios::app);
+	}
+
 	if (!jsonFile)
 	{
 		throw json_exception("Could not open file");
 		return false;
 	}
-	for (size_t i = 0; i < this->list->count(); i++)
-	{
-		this->list->getAt(i)->print(jsonFile, 0, pretty);
-	}
+	item->print(jsonFile, 0, pretty);
 	jsonFile.close();
 	return true;
 }
@@ -198,11 +215,11 @@ bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool p
 //	return arr;
 //}
 
-bool contains(const char * str, int size, const char tocken)
+bool contains(const char * str, int size, const char token)
 {
 	for (int i = 0; i < size; i++)
 	{
-		if (str[i] == tocken)
+		if (str[i] == token)
 		{
 			return true;
 		}

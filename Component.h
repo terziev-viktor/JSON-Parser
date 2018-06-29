@@ -9,14 +9,22 @@ namespace components
     {
     public:
 		virtual ~Component() = default;
-
+		// Print on the standard output stream
 		virtual void print(unsigned short tab_index = 0, bool pretty = true) const = 0;
+		// Print on a given output stream <out>
+		// <tab_index> is used to print the object in a pretty way
+		// <pretty> determines whether to print pretty(true) or minified(false)
 		virtual void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const = 0;
+
 		virtual bool operator==(const Component & other) const = 0;
 		virtual bool operator!=(const Component & other) const = 0;
+		
 		virtual Component & operator=(const Component & other) = 0;
 		virtual Component & operator+=(const Component & other) = 0;
+		
 		virtual Component * copy() const = 0;
+		
+		virtual const unsigned int size() const = 0;
     };
 	Component & operator+(const Component & left, const Component & right);
 

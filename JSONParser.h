@@ -25,11 +25,11 @@ namespace interpreters
 		// Loads a file for parsing
 		bool load(const char * path);
 		// Saves all parsed json objects to a file
-		bool save(const char * path, bool overrideFile = true, bool pretty = true);
-
+		bool save(const char * path, bool overrideFile = true, bool pretty = true) const;
+		bool save(const Component * item, const char * path, bool overrideFile = true, bool pretty = true) const;
 		// Finds all keys in json objects and all strings or numbers in arrays
 		// returns array of their values
-		//Array * findAll(const char * key);
+		Indexable * findAll(const char * key, const Indexable & in_object);
 
 		// getters
 		const Component * get(unsigned int index) const;
@@ -46,7 +46,7 @@ namespace interpreters
 		List<Component> * list;
 		string file;
 		bool fileLoaded;
-		bool fileExists(const char * path);
+		bool fileExists(const char * path) const;
 	};
 }
 

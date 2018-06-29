@@ -24,7 +24,7 @@ namespace tools
 		// I dont return a const item because Fmibook should be able to edit items;
 		const T * getAt(unsigned int index) const;
 		T * getAt(unsigned int index);
-		void setAt(unsigned int index, T * new_item);
+		void setAt(unsigned int index, T * new_item, bool __delete = true);
 		void removeAt(unsigned int index);
 		const bool isEmpty() const;
 		// sets the index to 0. Deletes objects
@@ -108,13 +108,18 @@ namespace tools
 	}
 
 	template<class T>
-	inline void List<T>::setAt(unsigned int index, T * new_item)
+	inline void List<T>::setAt(unsigned int index, T * new_item, bool __delete)
 	{
 		if (index >= 0 && index < this->index)
 		{
-			delete this->buffer[index];
+			if (__delete)
+			{
+				delete this->buffer[index];
+			}
 			this->buffer[index] = new_item;
+			return;
 		}
+		throw std::out_of_range("Index out of range");
 	}
 	
 	template<class T>
@@ -130,7 +135,7 @@ namespace tools
 		{
 			buffer[i] = buffer[i + 1];
 		}
-		this->index = this->index - 1;
+		--this->index;
 	}
 	
 	template<class T>

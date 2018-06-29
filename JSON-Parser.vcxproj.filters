@@ -16,6 +16,9 @@
     <Filter Include="Exceptions">
       <UniqueIdentifier>{044ff44a-79aa-4a91-acbb-08d0a8975975}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Commands">
+      <UniqueIdentifier>{8d7bd30c-4364-49fd-ab38-273d76d90ff8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Composite.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="Indexable.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="Modifiable.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>Commands</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

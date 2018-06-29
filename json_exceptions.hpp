@@ -11,6 +11,11 @@ namespace json_exceptions
 			strcpy_s(this->msg, sizeof(this->msg), msg);
 		}
 
+		virtual void log(std::ostream & os) const
+		{
+			os << msg << '\n';
+		}
+
 		const char * what() const
 		{
 			return this->msg;
@@ -27,12 +32,16 @@ namespace json_exceptions
 		{
 			this->line_number = line_number;
 		}
+		/*override*/
+		void log(std::ostream & os) const
+		{
+			os << what() << " @ line number " << this->get_line_number() << '\n';
+		}
 		const unsigned int get_line_number() const
 		{
 			return line_number;
 		}
 	private:
-		char msg[50];
 		unsigned int line_number;
 	};
 
@@ -43,6 +52,11 @@ namespace json_exceptions
 			:json_exception("Invalid key name provided")		
 		{
 			strcpy_s(this->key_name, sizeof(this->key_name), key_name);
+		}
+		/*override*/
+		void log(std::ostream & os) const
+		{
+			os << what() << " " << this->get_key_name() << '\n';
 		}
 		const char * get_key_name() const
 		{
@@ -60,6 +74,11 @@ namespace json_exceptions
 		{
 			this->setFrom(from);
 			this->setTo(to);
+		}
+		/*override*/
+		void log(std::ostream & os) const
+		{
+			os << what() << " from " << this->get_from() << " to " << this->get_to() << '\n';
 		}
 		const char * get_from() const
 		{

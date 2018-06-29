@@ -38,7 +38,11 @@ bool components::Number::tryParse(const char * str, int & out)
 	int result = 0;
 	int multiplier = 1;
 	size_t len = strlen(str);
-	for (int i = len - 1; i >= 0 ; --i)
+	if (len == 0)
+	{
+		return false;
+	}
+	for (int i = len - 1; i > 0; --i)
 	{
 		if (str[i] <= '9' && str[i] >= '0')
 		{
@@ -50,9 +54,18 @@ bool components::Number::tryParse(const char * str, int & out)
 			return false;
 		}
 	}
-	if (len > 0 && str[0] == '-')
+	if (str[0] == '-')
 	{
 		result *= -1;
+	}
+	else if (str[0] <= '9' && str[0] >= '0')
+	{
+		result += (str[0] - 48) * multiplier;
+		multiplier *= 10;
+	}
+	else
+	{
+		return false;
 	}
 	out = result;
 	return true;
@@ -144,6 +157,11 @@ components::Component * components::Number::copy() const
 {
 	Number * n = new Number(*this);
 	return n;
+}
+
+const unsigned int components::Number::size() const
+{
+	return 1;
 }
 
 Number & components::Number::operator+=(const Number & other)

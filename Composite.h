@@ -17,13 +17,16 @@ namespace components
     public:
 		Composite();
 		Composite(const Composite & other);
+		Composite(const Indexable & other);
     	~Composite();
 	
 		const bool hasKey(const char * key) const;
-		
+		void add(const Leaf & l);
+
 		/*override Modifiable*/
 		void add(unsigned int key_value_pairs_count, ...);
 		void add(const char * key); // this method is only for the sake of the demo. Normally I would put it in Array only because it has no meaning in a composite object
+		void add(const char * name, const char * value);
 		void update(const char * key, const char * json);
 		void update(int index, const char * json);
 		void update(int index, double number);
@@ -44,11 +47,10 @@ namespace components
 		Indexable & operator[](int index);
 		Indexable & operator=(const Indexable & other);
 		Indexable & operator+=(const Indexable & other);
-
-		void add(const char * name, const char * value);
-		void add(const Leaf & l);
+		const bool contains(const char * key, Component * out) const;
 
 		void swap(const char * keyA, const char * keyB);
+		void swap(unsigned int index1, unsigned int index2);
 		bool operator==(const Composite & other) const;
 		Composite & operator+=(const Composite & other);
 		Composite & operator=(const Composite & other);
@@ -57,6 +59,7 @@ namespace components
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
+		const unsigned int size() const;
 		bool operator==(const Component & other) const;
 		bool operator!=(const Component & other) const;
 		void print(unsigned short tab_index = 0, bool pretty = true) const;
@@ -68,9 +71,10 @@ namespace components
 		Leaf & findLeaf(const char * key, unsigned int & out);
 		const Leaf & findLeaf(const char * key, unsigned int & out) const;
 		void update(Leaf & l, const char * json);
-		bool leafExists(const char * key) const;
+		bool leafExists(const char * key, unsigned int & out) const;
+		void copyFrom(const Composite & other);
     };
-
+	Composite operator+(const Composite & left, const Composite & right);
 	class CompositeCreator : public ComponentCreator
 	{
 	public:

@@ -11,15 +11,13 @@ namespace components
 	public:
 		Array();
 		Array(const Array & other);
+		Array(const Indexable & other);
 		~Array();
 
 		void add(Component * item);
 		
-		void add(double number);
-
 		const unsigned int size() const;
 		const bool empty() const;
-		const bool contains(const char * item, Component *& out) const;
 		
 		Array & operator=(const Array & other);
 		Array & operator+=(const Array & other);
@@ -38,7 +36,9 @@ namespace components
 		void update(int index, Component * new_value);
 		void remove(const char * index);
 		void remove(int index);
-		
+		void swap(const char * key1, const char * key2);
+		void swap(unsigned int index1, unsigned int index2);
+
 		/*override Indexable*/
 		const Component & get(int index) const;
 		Component & get(int index);
@@ -50,6 +50,7 @@ namespace components
 		Indexable & operator[](const char * key);
 		const Indexable & operator[](const char * key) const;
 		const Indexable & operator[](int index) const;
+		const const bool contains(const char * item, Component * out) const;
 
 		/*override component*/
 		Component & operator=(const Component & other);
@@ -61,6 +62,7 @@ namespace components
 		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:
 		List<Component> values;
+		void copyFrom(const Array & other);
 	};
 	
 	class ArrayCreator :public ComponentCreator
@@ -69,4 +71,5 @@ namespace components
 		ArrayCreator();
 		Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const;
 	};
+	Array operator+(const Array & left, const Array & right);
 }

@@ -18,7 +18,13 @@ Composite::Composite()
 
 components::Composite::Composite(const Composite & other)
 {
-	this->leafs = other.leafs;
+	this->copyFrom(other);
+}
+
+components::Composite::Composite(const Indexable & other)
+{
+	const Composite & casted = dynamic_cast<const Composite &>(other);
+	this->copyFrom(casted);
 }
 
 Composite::~Composite()
@@ -132,11 +138,11 @@ void components::Composite::update(Leaf & l, const char * json)
 	}
 }
 
-bool components::Composite::leafExists(const char * key) const
+bool components::Composite::leafExists(const char * key, unsigned int & out) const
 {
 	try
 	{
-		const Leaf & l = this->findLeaf(key);
+		const Leaf & l = this->findLeaf(key, out);
 		return true;
 	}
 	catch (const invalid_key_name_exception&)
@@ -145,9 +151,15 @@ bool components::Composite::leafExists(const char * key) const
 	}
 }
 
+void components::Composite::copyFrom(const Composite & other)
+{
+	this->leafs = other.leafs;
+}
+
 const bool components::Composite::hasKey(const char * key) const
 {
-	return this->leafExists(key);
+	unsigned int dummy;
+	return this->leafExists(key, dummy);
 }
 
 void components::Composite::add(unsigned int key_value_pairs_count, ...)
@@ -215,7 +227,8 @@ void components::Composite::add(const char * name, const char * json)
 
 void components::Composite::add(const Leaf & l)
 {
-	if (this->leafExists(l.getName()))
+	unsigned int dummy;
+	if (this->leafExists(l.getName(), dummy))
 	{
 		throw invalid_key_name_exception(l.getName());
 	}
@@ -267,7 +280,7 @@ void components::Composite::update(int index, Component * new_value)
 void components::Composite::remove(const char * name)
 {
 	unsigned int index;
-	Leaf l = this->findLeaf(name, index);
+	Leaf & l = this->findLeaf(name, index);
 	this->remove(index);
 }
 
@@ -279,11 +292,16 @@ void components::Composite::remove(int index)
 void components::Composite::swap(const char * keyA, const char * keyB)
 {
 	Component * tmp;
-	Leaf a = this->findLeaf(keyA);
-	Leaf b = this->findLeaf(keyB);
+	Leaf & a = this->findLeaf(keyA);
+	Leaf & b = this->findLeaf(keyB);
 	tmp = a.getValue();
 	a.value = b.getValue();
 	b.value = tmp;
+}
+
+void components::Composite::swap(unsigned int index1, unsigned int index2)
+{
+	this->swap(this->leafs.getAt(index1).getName(), this->leafs.getAt(index2).getName());
 }
 
 bool components::Composite::operator==(const Composite & other) const
@@ -330,6 +348,11 @@ Component * components::Composite::copy() const
 		c->add(*l);
 	}
 	return c;
+}
+
+const unsigned int components::Composite::size() const
+{
+	return this->leafs.count();
 }
 
 bool components::Composite::operator==(const Component & other) const
@@ -399,6 +422,19 @@ Indexable & components::Composite::operator+=(const Indexable & other)
 {
 	const Composite & casted = dynamic_cast<const Composite&>(other);
 	return (*this += casted);
+}
+
+const bool components::Composite::contains(const char * key, Component * out) const
+{
+	unsigned int index;
+	const bool yes = this->leafExists(key, index);
+	if (yes)
+	{
+		out = this->get(index).copy();
+		return true;
+	}
+	return false;
+
 }
 
 components::CompositeCreator::CompositeCreator()
@@ -486,4 +522,9 @@ Component * components::CompositeCreator::createComponent(Vector<Token>::Iterato
 		++i; // continue building object
 	}
 	return result;
+}
+
+Composite components::operator+(const Composite & left, const Composite & right)
+{
+	return Composite(left) += right;
 }
