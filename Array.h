@@ -1,8 +1,8 @@
 #pragma once
-
-#include "Indexable.h"
 #include "tools\List.hpp"
 using tools::List;
+#include "JSONParser.h"
+using interpreters::JSONParser;
 
 namespace components
 {
@@ -14,7 +14,7 @@ namespace components
 		~Array();
 
 		void add(Component * item);
-		void add(const char * json);
+		
 		void add(double number);
 
 		const unsigned int size() const;
@@ -28,6 +28,8 @@ namespace components
 
 		/*override Modifiable*/
 		void add(unsigned int items_count, ...);
+		void add(const char * json);
+		void add(const char * json1, const char * json2);
 		void update(const char * key, const char * json);
 		void update(int index, const char * json);
 		void update(int index, double number);
@@ -42,23 +44,19 @@ namespace components
 		Component & get(int index);
 		const Component & get(const char * key)const;
 		Component & get(const char * key);
-		Indexable & operator=(const Indexable * other);
 		Indexable & operator=(const Indexable & other);
-	
+		Indexable & operator+=(const Indexable & other);
 		Indexable & operator[](int index);
 		Indexable & operator[](const char * key);
 		const Indexable & operator[](const char * key) const;
 		const Indexable & operator[](int index) const;
 
 		/*override component*/
-		Component & operator=(const Component * other);
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
-		bool operator==(const Component * other) const;
 		bool operator==(const Component & other) const;
 		bool operator!=(const Component & other) const;
-		bool operator!=(const Component * other) const;
 		void print(unsigned short tab_index = 0, bool pretty = true) const;
 		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:

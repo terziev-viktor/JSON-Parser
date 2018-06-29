@@ -238,7 +238,8 @@ namespace tools
 	template<class T>
 	inline Vector<T>& Vector<T>::operator+=(const Vector<T>& other)
 	{
-		for (size_t i = 0; i < other.count(); i++)
+		unsigned int count = other.count();
+		for (size_t i = 0; i < count; i++)
 		{
 			this->add(other[i]);
 		}

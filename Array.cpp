@@ -47,7 +47,7 @@ const Component & components::Array::get(const char * key) const
 	{
 		return *this->values.getAt(parsed);
 	}
-	throw std::invalid_argument("Invalid array index");
+	throw invalid_key_name_exception(key);
 }
 
 Component & components::Array::get(const char * key)
@@ -57,12 +57,7 @@ Component & components::Array::get(const char * key)
 	{
 		return *this->values.getAt(parsed);
 	}
-	throw std::invalid_argument("Invalid array index");
-}
-
-Indexable & components::Array::operator=(const Indexable * other)
-{
-	return *this = *other;
+	throw invalid_key_name_exception(key);
 }
 
 Indexable & components::Array::operator=(const Indexable & other)
@@ -71,36 +66,38 @@ Indexable & components::Array::operator=(const Indexable & other)
 	return (*this = casted);
 }
 
+Indexable & components::Array::operator+=(const Indexable & other)
+{
+	const Array & casted = dynamic_cast<const Array&>(other);
+	return (*this += casted);
+}
+
 void components::Array::update(const char * key, const char * json)
 {
 	int index;
 	bool success = Number::tryParse(key, index);
 	if (!success)
 	{
-		throw invalid_key_name_exception("Invalid key for array index");
+		throw invalid_key_name_exception(key);
 	}
 	this->update(index, json);
 }
 
 void components::Array::update(int index, const char * json)
 {
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
-	unsigned int line = 1;
-	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
-
+	Component * parsed = JSONParser::parseOne(json);
 	if (parsed)
 	{
 		this->update(index, parsed);
 	}
 	else
 	{
-		int n;
-		if (Number::tryParse(json, n))
+		try
 		{
-			this->update(index, new Number(n));
+			Number * n = new Number(json);
+			this->update(index, n);
 		}
-		else
+		catch (const std::exception&)
 		{
 			this->update(index, new String(json));
 		}
@@ -120,27 +117,30 @@ void components::Array::add(Component * item)
 
 void components::Array::add(const char * json)
 {
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
-	unsigned int line = 1;
-	Component * parsed = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	Component * parsed = JSONParser::parseOne(json);
 	if (parsed)
 	{
-		this->values.add(parsed);
+		this->add(parsed);
 	}
 	else
 	{
 		try
 		{
 			Number * n = new Number(json);
-			this->values.add(n);
+			this->add(n);
 		}
 		catch (const std::exception& e)
 		{
-			this->values.add(new String(json));
+			this->add(new String(json));
 		}
-		
+
 	}
+}
+
+void components::Array::add(const char * json1, const char * json2)
+{
+	this->add(json1);
+	this->add(json2);
 }
 
 void components::Array::add(double number)
@@ -171,7 +171,7 @@ const bool components::Array::contains(const char * item, Component *& out) cons
 	}
 	for (size_t i = 0; i < this->values.count(); i++)
 	{
-		if (*parsed == this->values.getAt(i))
+		if (*parsed == *this->values.getAt(i))
 		{
 			out = parsed;
 			return true;
@@ -183,17 +183,16 @@ const bool components::Array::contains(const char * item, Component *& out) cons
 
 Array & components::Array::operator=(const Array & other)
 {
+	if (this == &other)
+	{
+		return *this;
+	}
 	this->values.clear();
 	for (size_t i = 0; i < other.size(); i++)
 	{
 		this->values.add(other.get(i).copy());
 	}
 	return *this;
-}
-
-Component & components::Array::operator=(const Component * other)
-{
-	return *this = *other;
 }
 
 Component & components::Array::operator=(const Component & other)
@@ -231,10 +230,6 @@ Array & components::Array::operator-=(unsigned int index)
 	this->values.removeAt(index);
 	return *this;
 }
-bool components::Array::operator==(const Component * other) const
-{
-	return *this == *other;
-}
 
 bool components::Array::operator==(const Component & other) const
 {
@@ -252,11 +247,6 @@ bool components::Array::operator==(const Component & other) const
 bool components::Array::operator!=(const Component & other) const
 {
 	return !(*this == other);
-}
-
-bool components::Array::operator!=(const Component * other) const
-{
-	return *this != *other;
 }
 
 bool components::Array::operator==(const Array & other) const
@@ -424,9 +414,9 @@ components::Component * components::ArrayCreator::createComponent(Vector<Token>:
 		else
 		{
 			Component * complex = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
-			if (!complex)
+			if (complex == nullptr)
 			{
-				throw bad_json_exception("Error parsing json object", line_number);
+				throw bad_json_exception("Unexpected or unknown token", line_number);
 				return nullptr;
 			}
 			result->add(complex);

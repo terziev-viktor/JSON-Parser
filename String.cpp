@@ -3,7 +3,6 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
-
 using std::cout;
 using std::endl;
 components::String::String()
@@ -44,11 +43,19 @@ components::String::String(const string & other)
 components::String::String(const char * value)
 {
 	this->length = strlen(value);
-	this->capacity = this->length + 1;
-	this->value = new char[this->capacity];
-	for (size_t i = 0; i <= this->length; i++)
+	if (this->length == 0)
 	{
-		this->value[i] = value[i];
+		this->capacity = 0;
+		this->value = nullptr;
+	}
+	else
+	{
+		this->capacity = this->length + 1;
+		this->value = new char[this->capacity];
+		for (size_t i = 0; i <= this->length; i++)
+		{
+			this->value[i] = value[i];
+		}
 	}
 }
 
@@ -75,7 +82,7 @@ components::String components::String::substring(unsigned int from, unsigned int
 {
 	if (to < from)
 	{
-		throw std::logic_error("to cannot be before from");
+		throw std::logic_error("Cannot create a substring from staring position greater than ending position");
 	}
 	unsigned int capacity = to - from;
 	String result(capacity);
@@ -88,14 +95,10 @@ components::String components::String::substring(unsigned int from, unsigned int
 
 const int components::String::find_first(const char c, unsigned int start_from) const
 {
-	for (unsigned int i = start_from; i < this->length; ++i)
-	{
-		if (this->value[i] == c)
-		{
-			return i;
-		}
-	}
-	return -1;
+	char str[2];
+	str[0] = c;
+	str[1] = '\0';
+	return this->find_first_of(str, start_from);
 }
 
 const int components::String::find_first_of(const char * c, unsigned int start_from) const
@@ -114,13 +117,40 @@ const int components::String::find_first_of(const char * c, unsigned int start_f
 	return -1;
 }
 
+tools::Vector<components::String> components::String::split(char delim) const
+{
+	Vector<String> result;
+	int from = 0;
+	int to = 0;
+	while (to < this->getLen())
+	{
+		to = this->find_first(delim, from);
+		if (to < 0)
+		{
+			to = this->getLen();
+		}
+		result.add(this->substring(from, to));
+		from = to + 1;
+	}
+	
+	return result;
+}
+
 const char components::String::charAt(unsigned int at) const
 {
 	if (at < 0 || at >= this->length)
 	{
-		throw std::out_of_range("Index out of range");
+		throw std::out_of_range("String index out of range");
 	}
 	return this->value[at];
+}
+
+void components::String::setValue(const char c)
+{
+	char str[2];
+	str[0] = c;
+	str[1] = '\0';
+	this->setValue(str);
 }
 
 void components::String::setValue(const char * value)
@@ -136,19 +166,6 @@ void components::String::setValue(const char * value)
 	{
 		this->value[i] = value[i];
 	}
-}
-
-void components::String::setValue(const char c)
-{
-	if (this->value)
-	{
-		delete[] this->value;
-	}
-	this->value = new char[2];
-	this->length = 1;
-	this->capacity = 2;
-	this->value[0] = c;
-	this->value[1] = '\0';
 }
 
 const bool components::String::startsWith(const char ch) const
@@ -193,11 +210,6 @@ components::Component * components::String::copy() const
 	return new String(*this);
 }
 
-bool components::String::operator==(const Component * other) const
-{
-	return *this == *other;
-}
-
 bool components::String::operator==(const Component & other) const
 {
 	try
@@ -211,19 +223,9 @@ bool components::String::operator==(const Component & other) const
 	}
 }
 
-bool components::String::operator!=(const Component * other) const
-{
-	return !(*this == *other);
-}
-
 bool components::String::operator!=(const Component & other) const
 {
 	return !(*this == other);
-}
-
-components::Component & components::String::operator=(const Component * other)
-{
-	return (*this = *other);
 }
 
 components::Component & components::String::operator=(const Component & other)
@@ -291,6 +293,10 @@ components::String & components::String::operator+=(const char * other)
 	return *this;
 }
 
+// The idea here is to add one character very fast and efficient by initializing the object with greater capacity and then add char by char. Something like this:
+// String str(big_capacity)
+// for i=0 to big_capacity:
+// str += some_char
 components::String & components::String::operator+=(const char ch)
 {
 	if (this->capacity > this->length)
@@ -309,20 +315,19 @@ components::String & components::String::operator+=(const char ch)
 
 const char components::String::operator[](unsigned int index) const
 {
-	if (index >= 0 && index <= this->length)
-	{
-		return this->value[index];
-	}
-	throw std::out_of_range("Index out of range");
+	return this->charAt(index);
 }
 
 char components::String::operator[](unsigned int index)
 {
-	if (index < 0 || index >= this->length)
-	{
-		return this->value[index];
-	}
-	throw std::out_of_range("Index out of range");
+	return this->charAt(index);
+}
+
+components::String components::operator+(const String & a, const String & b)
+{
+	String c(a);
+	c += b;
+	return c;
 }
 
 std::ostream & components::operator<<(std::ostream & os, const String & obj)

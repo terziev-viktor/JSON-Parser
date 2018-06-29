@@ -22,6 +22,7 @@ namespace components
 		void setValue(Component * value);
 		Leaf & operator=(const Leaf & other);
 		bool operator==(const Leaf & other) const;
+		bool operator==(const char * str) const;
 		bool operator==(const Component * other) const;
 		Component * operator[](unsigned int index);
 		const Component * operator[](unsigned int index) const;

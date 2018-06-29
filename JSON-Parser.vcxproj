@@ -108,6 +108,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="Composite.cpp" />
+    <ClCompile Include="Indexable.cpp" />
     <ClCompile Include="JSONParser.cpp" />
     <ClCompile Include="Leaf.cpp" />
     <ClCompile Include="main.cpp" />

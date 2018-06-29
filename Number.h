@@ -3,7 +3,6 @@
 #include <string>
 using std::string;
 #include <fstream>
-//using factory::ComponentCreator;
 
 namespace components
 {
@@ -31,11 +30,8 @@ namespace components
 		Number & operator*=(const Number & other);
 		Number & operator/=(const Number & other);
 		/*override Component*/
-		bool operator==(const Component * other) const;
 		bool operator==(const Component & other) const;
-		bool operator!=(const Component * other) const;
 		bool operator!=(const Component & other) const;
-		Component & operator=(const Component * other);
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
@@ -43,6 +39,6 @@ namespace components
 		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
 	private:
 		double value;
-		
 	};
+	Number operator+(const Number & a, const Number & b);
 }

@@ -1,9 +1,7 @@
 #include "JSONParser.h"
 #include <fstream>
-#include "Tokenizer.h"
-#include "ComponentFactory.h"
-using factory::ComponentFactory;
-
+#include "json_exceptions.hpp"
+using namespace json_exceptions;
 using std::ifstream;
 using namespace interpreters;
 
@@ -23,46 +21,6 @@ const Component * JSONParser::get(unsigned int index) const
 	return this->list->getAt(index);
 }
 
-Composite * interpreters::JSONParser::getAsJsonObject(unsigned int index)
-{
-	if (index >= 0 && index < this->list->count())
-	{
-		Component * obj = this->list->getAt(index);
-		return dynamic_cast<Composite*>(obj);
-	}
-	return nullptr;
-}
-
-const Composite * interpreters::JSONParser::getAsJsonObject(unsigned int index) const
-{
-	if (index >= 0 && index < this->list->count())
-	{
-		Component * obj = this->list->getAt(index);
-		return dynamic_cast<Composite*>(obj);
-	}
-	return nullptr;
-}
-
-Array * interpreters::JSONParser::getAsJsonArray(unsigned int index)
-{
-	if (index >= 0 && index < this->list->count())
-	{
-		Component * obj = this->list->getAt(index);
-		return dynamic_cast<Array*>(obj);
-	}
-	return nullptr;
-}
-
-const Array * interpreters::JSONParser::getAsJsonArray(unsigned int index) const
-{
-	if (index >= 0 && index < this->list->count())
-	{
-		Component * obj = this->list->getAt(index);
-		return dynamic_cast<Array*>(obj);
-	}
-	return nullptr;
-}
-
 Component * interpreters::JSONParser::get(unsigned int index)
 {
 	return this->list->getAt(index);
@@ -70,16 +28,28 @@ Component * interpreters::JSONParser::get(unsigned int index)
 
 const unsigned int interpreters::JSONParser::getParsedCount() const
 {
-	return this->list->count();
+	if (this->list)
+	{
+		return this->list->count();
+	}
+	return 0;
 }
 
 const Indexable & interpreters::JSONParser::operator[](unsigned int index) const
 {
+	if (index < 0 || index >= this->getParsedCount())
+	{
+		throw json_exception("Invalid index");
+	}
 	return dynamic_cast<const Indexable&>(*this->get(index));
 }
 
 Indexable & interpreters::JSONParser::operator[](unsigned int index)
 {
+	if (index < 0 || index >= this->getParsedCount())
+	{
+		throw json_exception("Invalid index");
+	}
 	return dynamic_cast<Indexable&>(*this->get(index));
 }
 
@@ -131,6 +101,26 @@ bool interpreters::JSONParser::parse()
 	return this->parse(this->file);
 }
 
+Component * interpreters::JSONParser::parseOne(const char * json)
+{
+	Vector<Token> tokens = Tokenizer::tokenize(json);
+	Vector<Token>::Iterator i = tokens.createIterator();
+	unsigned int line = 1;
+	ComponentCreator::skipWhitespace(i, line);
+	Component * p = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	if (p)
+	{
+		++i;
+		ComponentCreator::skipWhitespace(i, line);
+		if (!i.isDone())
+		{
+			throw bad_json_exception("End of string/file expected", line);
+		}
+		return p;
+	}
+	return nullptr;
+}
+
 bool interpreters::JSONParser::load(const char * path)
 {
 	ifstream in;
@@ -160,12 +150,12 @@ bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool p
 	size_t len = strlen(path);
 	if (path[len - 1] != 'n' || path[len - 2] != 'o' || path[len - 3] != 's' || path[len - 4] != 'j' || path[len - 5] != '.')
 	{
-		throw std::invalid_argument("path must be .json file");
+		throw json_exception("path must be .json file");
 		return false;
 	}
 	if (!overrideFile && this->fileExists(path))
 	{
-		throw std::exception("File already exists. Set <overrideFile> parameter to true if you wish to override it");
+		throw json_exception("File already exists. Set <overrideFile> parameter to true if you wish to override it");
 		return false;
 	}
 	std::ofstream jsonFile;
@@ -173,7 +163,7 @@ bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool p
 	
 	if (!jsonFile)
 	{
-		throw std::exception("Could not open file");
+		throw json_exception("Could not open file");
 		return false;
 	}
 	for (size_t i = 0; i < this->list->count(); i++)

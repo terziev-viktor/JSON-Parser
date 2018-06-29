@@ -93,6 +93,12 @@ bool components::Leaf::operator==(const Leaf & other) const
 	return *this->value == *other.value;
 }
 
+bool components::Leaf::operator==(const char * str) const
+{
+	int i = strcmp(str, this->name);
+	return i == 0;
+}
+
 bool components::Leaf::operator==(const Component * other) const
 {
 	const Leaf * casted = dynamic_cast<const Leaf*>(other);

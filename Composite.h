@@ -23,6 +23,7 @@ namespace components
 		
 		/*override Modifiable*/
 		void add(unsigned int key_value_pairs_count, ...);
+		void add(const char * key); // this method is only for the sake of the demo. Normally I would put it in Array only because it has no meaning in a composite object
 		void update(const char * key, const char * json);
 		void update(int index, const char * json);
 		void update(int index, double number);
@@ -41,8 +42,8 @@ namespace components
 		Indexable & operator[](const char * key);
 		const Indexable & operator[](int index) const;
 		Indexable & operator[](int index);
-		Indexable & operator=(const Indexable * other);
 		Indexable & operator=(const Indexable & other);
+		Indexable & operator+=(const Indexable & other);
 
 		void add(const char * name, const char * value);
 		void add(const Leaf & l);
@@ -53,13 +54,10 @@ namespace components
 		Composite & operator=(const Composite & other);
 
 		/*override Component*/ 
-		Component & operator=(const Component * other);
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
-		bool operator==(const Component * other) const;
 		bool operator==(const Component & other) const;
-		bool operator!=(const Component * other) const;
 		bool operator!=(const Component & other) const;
 		void print(unsigned short tab_index = 0, bool pretty = true) const;
 		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;

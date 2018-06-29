@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 using std::string;
-
+#include "json_exceptions.hpp"
+using json_exceptions::json_exception;
 #include "Vector.hpp"
 using tools::Vector;
 

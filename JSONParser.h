@@ -1,13 +1,10 @@
 #pragma once
-#include "tools\List.hpp"
-#include "Composite.h"
-#include "Array.h"
-using components::Array;
-using components::Composite;
-
+#include "ComponentFactory.h"
 #include <string>
+#include "Indexable.h"
+using namespace components;
 using std::string;
-
+using factory::ComponentFactory;
 using namespace tools;
 using namespace components;
 
@@ -24,7 +21,7 @@ namespace interpreters
 		bool parse(const std::string & json);
 		bool parse(const char * json);
 		bool parse();
-
+		static Component * parseOne(const char * json);
 		// Loads a file for parsing
 		bool load(const char * path);
 		// Saves all parsed json objects to a file
@@ -37,10 +34,6 @@ namespace interpreters
 		// getters
 		const Component * get(unsigned int index) const;
 		Component * get(unsigned int index);
-		Composite * getAsJsonObject(unsigned int index);
-		const Composite * getAsJsonObject(unsigned int index) const;
-		Array * getAsJsonArray(unsigned int index);
-		const Array * getAsJsonArray(unsigned int index) const;
 		const Indexable & operator[](unsigned int index) const;
 		Indexable & operator[](unsigned int index);
 

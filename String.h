@@ -20,6 +20,7 @@ namespace components
 		String substring(unsigned int from, unsigned int to) const;
 		const int find_first(const char c, unsigned int start_from = 0) const;
 		const int find_first_of(const char * c, unsigned int start_from = 0) const;
+		Vector<String> split(char delim) const;
 
 		const char charAt(unsigned int at) const;
 		void setValue(const char * value);
@@ -38,13 +39,10 @@ namespace components
 		String & operator+=(const char * other);
 		String & operator+=(const char ch);
 		/*override Component*/
-		Component & operator=(const Component * other);
 		Component & operator=(const Component & other);
 		Component & operator+=(const Component & other);
 		Component * copy() const;
-		bool operator==(const Component * other) const;
 		bool operator==(const Component & other) const;
-		bool operator!=(const Component * other) const;
 		bool operator!=(const Component & other) const;
 		bool operator==(const String & other) const;
 		bool operator==(const char * other) const;
@@ -56,6 +54,7 @@ namespace components
 		unsigned int length;
 		unsigned int capacity;
 	};
+	String operator+(const String & a, const String & b);
 	std::ostream & operator<<(std::ostream&, const String &);
 }
 

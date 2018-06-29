@@ -1,10 +1,10 @@
 #include "Tokenizer.h"
-
 Vector<Token> Tokenizer::tokenize(const string & str)
 {
 	Vector<Token> tokens;
 	bool EndOfStringReached = false;
-	for (size_t i = 0; !EndOfStringReached && i < str.length(); ++i)
+	size_t len = str.length();
+	for (size_t i = 0; !EndOfStringReached && i < len; ++i)
 	{
 		char current = str[i];
 		switch (current)
@@ -17,7 +17,7 @@ Vector<Token> Tokenizer::tokenize(const string & str)
 		}
 		case '}':
 		{
-			Token t(TokenNames::ObjectEnd, '{');
+			Token t(TokenNames::ObjectEnd, '}');
 			tokens.add(t);
 			break;
 		}
@@ -45,10 +45,24 @@ Vector<Token> Tokenizer::tokenize(const string & str)
 			tokens.add(t);
 			break;
 		}
-		case '"':
+		case '"': // reading a string
 		{
 			Token t(TokenNames::DoubleQuote, '"');
 			tokens.add(t);
+			++i;
+			int to = str.find("\"", i);
+			if (to < 0)
+			{
+				to = len;
+			}
+			string strValue = str.substr(i, to - i);
+			Token strOrNum(TokenNames::StringOrNumber, strValue);
+			tokens.add(strOrNum);
+			if (to < len)
+			{
+				i = to;
+				tokens.add(Token(DoubleQuote, '"'));
+			}
 			break;
 		}
 		case '\'':
@@ -84,8 +98,9 @@ Vector<Token> Tokenizer::tokenize(const string & str)
 		}
 		default:
 		{
-			int to = str.find_first_of("]},\"\0", i);
-			if (to == -1)
+			// Reading a number
+			int to = str.find_first_of("]},\n \t", i);
+			if (to <= -1)
 			{
 				Token t(TokenNames::Unknown, '0');
 				tokens.add(t);
@@ -173,6 +188,6 @@ Token & Token::operator=(const Token & other)
 
 std::ostream & operator<<(std::ostream & os, const Token & t)
 {
-	os << t.getName() << " : " << t.getValue();
+	os << t.getName() << "   " << t.getValue();
 	return os;
 }

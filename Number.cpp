@@ -11,6 +11,7 @@ const double Number::EPS = 1e-15;
 
 Number::Number()
 {
+	this->value = 0;
 }
 
 components::Number::Number(const Number & other)
@@ -28,7 +29,6 @@ components::Number::Number(const double v)
 	this->value = v;
 }
 
-
 Number::~Number()
 {
 }
@@ -38,7 +38,7 @@ bool components::Number::tryParse(const char * str, int & out)
 	int result = 0;
 	int multiplier = 1;
 	size_t len = strlen(str);
-	for (size_t i = len - 1; i >= 0 ; --i)
+	for (int i = len - 1; i >= 0 ; --i)
 	{
 		if (str[i] <= '9' && str[i] >= '0')
 		{
@@ -47,10 +47,15 @@ bool components::Number::tryParse(const char * str, int & out)
 		}
 		else
 		{
-			throw std::invalid_argument("String is not an integer");
+			return false;
 		}
 	}
+	if (len > 0 && str[0] == '-')
+	{
+		result *= -1;
+	}
 	out = result;
+	return true;
 }
 
 void components::Number::setValue(double v)
@@ -71,14 +76,31 @@ Number & components::Number::operator=(const Number & other)
 
 bool components::Number::operator<(const Number & other) const
 {
-	double diff = this->value - other.getValue();
-	return diff < 0;
+	if (this->value < 0 && other.value > 0)
+	{
+		return true;
+	}
+	if (this->value > 0 && other.value < 0)
+	{
+		return false;
+	}
+	if (this->value > 0) // both are positive
+	{
+		double diff = this->value - other.getValue();
+		return diff < 0;
+	}
+	else // both are negative
+	{
+		double a = this->value * -1;
+		double b = other.value * -1;
+		double diff = a - b;
+		return diff < 0;
+	}
 }
 
 bool components::Number::operator>(const Number & other) const
 {
-	double diff = this->value - other.getValue();
-	return diff > 0;
+	return !(*this < other);
 }
 
 bool components::Number::operator==(const Number & other) const
@@ -88,11 +110,6 @@ bool components::Number::operator==(const Number & other) const
 	return diff < Number::EPS;
 }
 
-bool components::Number::operator==(const Component * other) const
-{
-	return *this == *other;
-}
-
 bool components::Number::operator==(const Component & other) const
 {
 	try
@@ -100,25 +117,15 @@ bool components::Number::operator==(const Component & other) const
 		const Number & casted = dynamic_cast<const Number&>(other);
 		return *this == casted;
 	}
-	catch (const std::exception&)
+	catch (const std::bad_cast&)
 	{
 		return false;
 	}
 }
 
-bool components::Number::operator!=(const Component * other) const
-{
-	return *this != *other;
-}
-
 bool components::Number::operator!=(const Component & other) const
 {
 	return !(*this == other);
-}
-
-components::Component & components::Number::operator=(const Component * other)
-{
-	return *this = *other;
 }
 
 components::Component & components::Number::operator=(const Component & other)
@@ -171,4 +178,11 @@ void components::Number::print(unsigned short tab_index, bool pretty) const
 void components::Number::print(std::ostream & out, unsigned short tab_index, bool pretty) const
 {
 	out << value;
+}
+
+Number components::operator+(const Number & a, const Number & b)
+{
+	Number n(a);
+	n += b;
+	return n;
 }

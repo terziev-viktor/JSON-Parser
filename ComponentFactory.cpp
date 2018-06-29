@@ -24,13 +24,24 @@ List<Component> * factory::ComponentFactory::createFromTokens(Vector<Token>::Ite
 	while (!i.isDone())
 	{
 		ComponentCreator::skipWhitespace(i, line_number);
+		if (i.isDone())
+		{
+			return result;
+		}
 		unsigned int old = line_number;
 		Component * next = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
-		if (next != nullptr)
+		if (next == nullptr)
 		{
-			result->add(next);
+			delete result;
+			throw bad_json_exception("Unexpected token", old);
 		}
+		result->add(next);
 		++i;
+	}
+	if (result->count() == 0)
+	{
+		delete result;
+		return nullptr;
 	}
 	return result;
 }

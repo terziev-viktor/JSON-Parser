@@ -7,6 +7,9 @@ namespace components
 	{
 	public:
 		virtual void add(unsigned int n, ...) = 0;
+		//these methods is only for the sake of the demo. Normally I would put it in Array only, because it has no meaning in a composite object
+		virtual void add(const char * item) = 0;
+		virtual void add(const char * key, const char * value) = 0;
 
 		virtual void update(const char * key, const char * json) = 0;
 		virtual void update(int index, const char * json) = 0;

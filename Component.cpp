@@ -36,3 +36,10 @@ const Token & components::ComponentCreator::getEndToken() const
 {
 	return this->end;
 }
+
+Component & components::operator+(const Component & left, const Component & right)
+{
+	Component * c = left.copy();
+	*c += right;
+	return *c;
+}
