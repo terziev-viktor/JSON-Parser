@@ -11,6 +11,8 @@ This is my 1st course project in FMI.
    The object can add more sub-objects in  
 5. Remove  
    The object can remove sub-objects  
+6. Swap  
+   Swaps values of two keys  
    
 Each object can be compared to other objects. Objects can also modified, indexed swapped, printed...  
 
