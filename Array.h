@@ -1,75 +1,53 @@
 #pragma once
-#include "tools\List.hpp"
-using tools::List;
-#include "JSONParser.h"
-using interpreters::JSONParser;
-
+#include "tools\PointerContainer.hpp"
+using tools::PointerContainer;
+#include "JSON.h"
 namespace components
 {
-	class Array : public Indexable
+	class Array : public JSON
 	{
 	public:
-		Array();
-		Array(const Array & other);
-		Array(const Indexable & other);
 		~Array();
-
-		void add(Component * item);
-		
-		const unsigned int size() const;
-		const bool empty() const;
+		void add(const Component&);
 		
 		Array & operator=(const Array & other);
 		Array & operator+=(const Array & other);
 		Array & operator-=(unsigned int index);
 		bool operator==(const Array & other) const;
+		bool operator!=(const Array & other) const;
+		Component & operator[](unsigned int index);
+		const Component & operator[](unsigned int index) const;
+		/*override JSON*/
+		JSON & get(const String & index);
+		const JSON & get(const String & index) const;
 
-		/*override Modifiable*/
-		void add(unsigned int items_count, ...);
-		void add(const char * json);
-		void add(const char * json1, const char * json2);
-		void update(const char * key, const char * json);
-		void update(int index, const char * json);
-		void update(int index, double number);
-		void update(const char * key, double number);
-		void update(const char * key, Component * new_value);
-		void update(int index, Component * new_value);
-		void remove(const char * index);
-		void remove(int index);
-		void swap(const char * key1, const char * key2);
-		void swap(unsigned int index1, unsigned int index2);
+		void update(const String&, const Component & new_value);
+		void remove(const String&);
+		void swap(const String& str1, const String& str2);
+		void components::Array::add(unsigned int items_count, ...);
 
-		/*override Indexable*/
-		const Component & get(int index) const;
-		Component & get(int index);
-		const Component & get(const char * key)const;
-		Component & get(const char * key);
-		Indexable & operator=(const Indexable & other);
-		Indexable & operator+=(const Indexable & other);
-		Indexable & operator[](int index);
-		Indexable & operator[](const char * key);
-		const Indexable & operator[](const char * key) const;
-		const Indexable & operator[](int index) const;
-		const const bool contains(const char * item, Component * out) const;
+		unsigned int count() const;
+		void clear();
+		bool is_empty() const;
+		int index_of(const Component & other) const;
 
 		/*override component*/
-		Component & operator=(const Component & other);
-		Component & operator+=(const Component & other);
 		Component * copy() const;
-		bool operator==(const Component & other) const;
-		bool operator!=(const Component & other) const;
-		void print(unsigned short tab_index = 0, bool pretty = true) const;
-		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
+		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
+		bool equals(const Component & other) const;
+		cstring tell_type() const;
 	private:
-		List<Component> values;
-		void copyFrom(const Array & other);
+		PointerContainer<Component> values;
 	};
-	
-	class ArrayCreator :public ComponentCreator
+
+	namespace creators
 	{
-	public:
-		ArrayCreator();
-		Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const;
-	};
-	Array operator+(const Array & left, const Array & right);
+		class ArrayCreator :public ComponentCreator
+		{
+		public:
+			Component * createComponent(TokensSimulator & tokens, unsigned int & line_number) const;
+
+			static Array * create_array(TokensSimulator & tokens, unsigned int & line_number);
+		};
+	}
 }

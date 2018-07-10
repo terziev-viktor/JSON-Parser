@@ -1,45 +1,8 @@
 #pragma once
 #include "Component.h"
 #include "ComponentFactory.h"
-using components::Component;
-#include <string>
 
-components::ComponentCreator::ComponentCreator(Token begin, Token end)
+components::creators::ComponentCreator::ComponentCreator()
 {
-	this->begin = begin;
-	this->end = end;
 	factory::ComponentFactory::getFactory().registerCreator(this);
-}
-
-components::ComponentCreator::~ComponentCreator()
-{
-}
-
-void components::ComponentCreator::skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number)
-{
-	while (i->getName() == TokenNames::Spacebar || i->getName() == TokenNames::Tab || i->getName() == TokenNames::NewLine)
-	{
-		if (i->getName() == NewLine)
-		{
-			++line_number;
-		}
-		++i;
-	}
-}
-
-const Token & components::ComponentCreator::getBeginToken() const
-{
-	return this->begin;
-}
-
-const Token & components::ComponentCreator::getEndToken() const
-{
-	return this->end;
-}
-
-Component & components::operator+(const Component & left, const Component & right)
-{
-	Component * c = left.copy();
-	*c += right;
-	return *c;
 }

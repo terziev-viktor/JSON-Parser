@@ -1,84 +1,57 @@
 #pragma once
-#include "Leaf.h"
+#include "tools\PointerContainer.hpp"
 #include "String.h"
-#include "Number.h"
-#include "Indexable.h"
-#include "ComponentFactory.h"
-using factory::ComponentFactory;
-using components::String;
-using components::Number;
-//using factory::ComponentCreator;
+#include "JSON.h"
+using tools::PointerContainer;
 
 namespace components
 {
 	// This is a components with children other components (Leafs or Composites)
-    class Composite : public Indexable
+    class Composite : public JSON
     {
     public:
-		Composite();
-		Composite(const Composite & other);
-		Composite(const Indexable & other);
-    	~Composite();
-	
-		const bool hasKey(const char * key) const;
-		void add(const Leaf & l);
-
-		/*override Modifiable*/
+		~Composite();
+		const Vector<String> get_keys() const;
+		const PointerContainer<Component> & get_values() const;
+		
+		void add(const String & key, const Component & value);
+		
+		/*override JSON*/
+		JSON & get(const String & index);
+		const JSON & get(const String & index) const;
+		void swap(const String &key1, const String &key2);
 		void add(unsigned int key_value_pairs_count, ...);
-		void add(const char * key); // this method is only for the sake of the demo. Normally I would put it in Array only because it has no meaning in a composite object
-		void add(const char * name, const char * value);
-		void update(const char * key, const char * json);
-		void update(int index, const char * json);
-		void update(int index, double number);
-		void update(const char * key, double number);
-		void update(const char * key, Component * new_value);
-		void update(int index, Component * new_value);
-		void remove(const char * key);
-		void remove(int index);
+		void remove(const String & key);
+		void update(const String & key, const Component & new_value);
 
-		/*override Indexable*/
-		const Component & get(const char * name) const;
-		Component & get(const char * name);
-		const Component & get(int index) const;
-		Component & get(int index);
-		const Indexable & operator[](const char * key) const;
-		Indexable & operator[](const char * key);
-		const Indexable & operator[](int index) const;
-		Indexable & operator[](int index);
-		Indexable & operator=(const Indexable & other);
-		Indexable & operator+=(const Indexable & other);
-		const bool contains(const char * key, Component * out) const;
+		unsigned int count() const;
+		int index_of(const Component & item) const;
+		bool is_empty() const;
+		void clear();
 
-		void swap(const char * keyA, const char * keyB);
-		void swap(unsigned int index1, unsigned int index2);
+		/*operators*/
 		bool operator==(const Composite & other) const;
 		Composite & operator+=(const Composite & other);
 		Composite & operator=(const Composite & other);
+		Component & operator[](const String & key);
+		const Component & operator[](const String & key) const;
 
 		/*override Component*/ 
-		Component & operator=(const Component & other);
-		Component & operator+=(const Component & other);
 		Component * copy() const;
-		const unsigned int size() const;
-		bool operator==(const Component & other) const;
-		bool operator!=(const Component & other) const;
-		void print(unsigned short tab_index = 0, bool pretty = true) const;
-		void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const;
+		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
+		bool equals(const Component & other) const;
+		cstring tell_type() const;
     private:
-    	Vector<Leaf> leafs;
-		Leaf & findLeaf(const char * key);
-		const Leaf & findLeaf(const char * key) const;
-		Leaf & findLeaf(const char * key, unsigned int & out);
-		const Leaf & findLeaf(const char * key, unsigned int & out) const;
-		void update(Leaf & l, const char * json);
-		bool leafExists(const char * key, unsigned int & out) const;
-		void copyFrom(const Composite & other);
+    	Vector<String> keys;
+		PointerContainer<Component> values;
     };
-	Composite operator+(const Composite & left, const Composite & right);
-	class CompositeCreator : public ComponentCreator
+	namespace creators
 	{
-	public:
-		CompositeCreator();
-		Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const;
-	};
+		class CompositeCreator : public ComponentCreator
+		{
+		public:
+			Component * createComponent(TokensSimulator & tokens, unsigned int & line_number) const;
+			static Composite * create_json(TokensSimulator & tokens, unsigned int & line_number);
+		};
+	}
 }

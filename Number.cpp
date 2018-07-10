@@ -1,89 +1,50 @@
+#pragma once
 #include "Number.h"
-#include "String.h"
-#include <iostream>
 #include <math.h>
-
-using std::cout;
 using components::Number;
-using components::String;
 
 const double Number::EPS = 1e-15;
+static const components::creators::NumberCreator theNumberCreator;
 
-Number::Number()
+Number::Number():value(0.0)
 {
-	this->value = 0;
+
 }
 
-components::Number::Number(const Number & other)
+components::Number::Number(const cstring & other)
 {
-	this->value = other.value;
-}
-
-components::Number::Number(const string & str)
-{
-	this->value = stod(str);
+	this->set_value(other);
 }
 
 components::Number::Number(const double v)
 {
-	this->value = v;
+	this->set_value(v);
 }
 
-Number::~Number()
-{
-}
-
-bool components::Number::tryParse(const char * str, int & out)
-{
-	int result = 0;
-	int multiplier = 1;
-	size_t len = strlen(str);
-	if (len == 0)
-	{
-		return false;
-	}
-	for (int i = len - 1; i > 0; --i)
-	{
-		if (str[i] <= '9' && str[i] >= '0')
-		{
-			result += (str[i] - 48) * multiplier;
-			multiplier *= 10;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	if (str[0] == '-')
-	{
-		result *= -1;
-	}
-	else if (str[0] <= '9' && str[0] >= '0')
-	{
-		result += (str[0] - 48) * multiplier;
-		multiplier *= 10;
-	}
-	else
-	{
-		return false;
-	}
-	out = result;
-	return true;
-}
-
-void components::Number::setValue(double v)
-{
-	this->value = v;
-}
-
-const double components::Number::getValue() const
+const double components::Number::get_value() const
 {
 	return this->value;
 }
 
-Number & components::Number::operator=(const Number & other)
+void components::Number::set_value(const cstring & str)
 {
-	this->value = other.value;
+	char * end;
+	const char * str_num = str.get_as_char_array();
+	this->value = strtod(str_num, &end);
+	if (end == str_num)
+	{
+		throw bad_cast_exception("cstring", "Number");
+	}
+}
+
+void components::Number::set_value(const double v)
+{
+	this->value = v;
+}
+
+Number & components::Number::operator=(const double value)
+{
+	this->set_value(value);
 	return *this;
 }
 
@@ -97,18 +58,21 @@ bool components::Number::operator<(const Number & other) const
 	{
 		return false;
 	}
-	if (this->value > 0) // both are positive
+	double diff;
+	if (this->value > 0)
 	{
-		double diff = this->value - other.getValue();
-		return diff < 0;
+		diff = (abs(this->value) - (other.get_value()));
 	}
-	else // both are negative
+	else
 	{
-		double a = this->value * -1;
-		double b = other.value * -1;
-		double diff = a - b;
-		return diff < 0;
+		diff = abs(abs(this->value) - abs(other.get_value()));
 	}
+	return diff < 0;
+}
+
+bool components::Number::operator<=(const Number & other) const
+{
+	return !(*this > other);
 }
 
 bool components::Number::operator>(const Number & other) const
@@ -116,41 +80,23 @@ bool components::Number::operator>(const Number & other) const
 	return !(*this < other);
 }
 
-bool components::Number::operator==(const Number & other) const
+bool components::Number::operator>=(const Number & other) const
 {
-	double diff = this->value - other.getValue();
-	diff = fabs(diff);
-	return diff < Number::EPS;
+	return !(*this < other);
 }
 
-bool components::Number::operator==(const Component & other) const
+bool components::Number::operator==(const Number & other) const
 {
-	try
-	{
-		const Number & casted = dynamic_cast<const Number&>(other);
-		return *this == casted;
-	}
-	catch (const std::bad_cast&)
+	if (this->value < 0 && other.value > 0)
 	{
 		return false;
 	}
-}
-
-bool components::Number::operator!=(const Component & other) const
-{
-	return !(*this == other);
-}
-
-components::Component & components::Number::operator=(const Component & other)
-{
-	const Number & n = dynamic_cast<const Number&>(other);
-	return *this = n;
-}
-
-components::Component & components::Number::operator+=(const Component & other)
-{
-	const Number & casted = dynamic_cast<const Number &>(other);
-	return (*this += casted);
+	if (this->value > 0 && other.value < 0)
+	{
+		return false;
+	}
+	double diff = abs(abs(this->value) - abs(other.get_value()));
+	return diff < EPS;
 }
 
 components::Component * components::Number::copy() const
@@ -161,7 +107,7 @@ components::Component * components::Number::copy() const
 
 const unsigned int components::Number::size() const
 {
-	return 1;
+	return fabs(this->get_value());
 }
 
 Number & components::Number::operator+=(const Number & other)
@@ -188,14 +134,19 @@ Number & components::Number::operator/=(const Number & other)
 	return *this;
 }
 
-void components::Number::print(unsigned short tab_index, bool pretty) const
+void components::Number::print(std::ostream & out, bool pretty, unsigned int tab_index) const
 {
-	print(cout, tab_index, pretty);
+	out << this->value;
 }
 
-void components::Number::print(std::ostream & out, unsigned short tab_index, bool pretty) const
+bool components::Number::equals(const Component & other) const
 {
-	out << value;
+	return false;
+}
+
+cstring components::Number::tell_type() const
+{
+	return "Number";
 }
 
 Number components::operator+(const Number & a, const Number & b)
@@ -203,4 +154,44 @@ Number components::operator+(const Number & a, const Number & b)
 	Number n(a);
 	n += b;
 	return n;
+}
+
+std::ostream & components::operator<<(std::ostream & os, const Number & n)
+{
+	os << n.get_value();
+	return os;
+}
+
+components::Component * components::creators::NumberCreator::createComponent(TokensSimulator & tokens, unsigned int & line_number) const
+{
+	Number * result = nullptr;
+	tokens.save_pos();
+	char c = tokens.get();
+	cstring str(10);
+	while ((c >= '0' && c <= '9') || (c == '-' || c == '.'))
+	{
+		str += c;
+		tokens.next();
+		if (tokens.is_done())
+		{
+			break;
+		}
+		c = tokens.get();
+	}
+	if (str.get_length() == 0)
+	{
+		tokens.revert();
+		return nullptr;
+	}
+	try
+	{
+		result = new Number(str);
+	}
+	catch (const std::exception&)
+	{
+		tokens.revert();
+		return nullptr;
+	}
+	return result;
+
 }

@@ -1,45 +1,38 @@
 #pragma once
-#include <iostream>
-#include "Tokenizer.h"
+#include "TokensSimulator.h"
+#include "cstring.h"
+#include "json_exceptions.hpp"
+using namespace json_exceptions;
+using tools::cstring;
+using tools::TokensSimulator;
 
 namespace components
 {
-    // This class represents the abstraction of different json parts (key-value-pairs, composite objects)
-    class Component
-    {
-    public:
+	// This class represents the abstraction of different json components
+	class Component
+	{
+	public:
 		virtual ~Component() = default;
-		// Print on the standard output stream
-		virtual void print(unsigned short tab_index = 0, bool pretty = true) const = 0;
 		// Print on a given output stream <out>
 		// <tab_index> is used to print the object in a pretty way
 		// <pretty> determines whether to print pretty(true) or minified(false)
-		virtual void print(std::ostream & out, unsigned short tab_index = 0, bool pretty = true) const = 0;
+		virtual void print(std::ostream & out, bool pretty, unsigned int tab_index) const = 0;
 
-		virtual bool operator==(const Component & other) const = 0;
-		virtual bool operator!=(const Component & other) const = 0;
-		
-		virtual Component & operator=(const Component & other) = 0;
-		virtual Component & operator+=(const Component & other) = 0;
-		
 		virtual Component * copy() const = 0;
-		
-		virtual const unsigned int size() const = 0;
-    };
-	Component & operator+(const Component & left, const Component & right);
 
-	class ComponentCreator
-	{
-	public:
-		ComponentCreator(Token begin, Token end);
-		virtual ~ComponentCreator();
+		virtual bool equals(const Component & other) const = 0;
 
-		virtual Component * createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const = 0;
-		static void skipWhitespace(Vector<Token>::Iterator & i, unsigned int & line_number);
-		const Token & getBeginToken() const;
-		const Token & getEndToken() const;
-	protected:
-		Token begin;
-		Token end;
+		virtual cstring tell_type() const = 0;
 	};
+	namespace creators
+	{
+		class ComponentCreator
+		{
+		public:
+			ComponentCreator();
+			virtual ~ComponentCreator() = default;
+
+			virtual Component * createComponent(TokensSimulator & tokens, unsigned int & line_number) const = 0;
+		};
+	}
 } // components

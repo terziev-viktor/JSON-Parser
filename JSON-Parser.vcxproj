@@ -105,34 +105,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Array.cpp" />
+    <ClCompile Include="Boolean.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="Composite.cpp" />
-    <ClCompile Include="Indexable.cpp" />
+    <ClCompile Include="cstring.cpp" />
     <ClCompile Include="JSONParser.cpp" />
-    <ClCompile Include="Leaf.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Number.cpp" />
     <ClCompile Include="String.cpp" />
-    <ClCompile Include="Tokenizer.cpp" />
+    <ClCompile Include="TokensSimulator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Boolean.h" />
     <ClInclude Include="Commands.h" />
-    <ClInclude Include="Modifiable.h" />
-    <ClInclude Include="Indexable.h" />
+    <ClInclude Include="cstring.h" />
+    <ClInclude Include="JSON.h" />
     <ClInclude Include="json_exceptions.hpp" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="Composite.h" />
     <ClInclude Include="JSONParser.h" />
-    <ClInclude Include="Leaf.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="String.h" />
-    <ClInclude Include="Tokenizer.h" />
-    <ClInclude Include="tools\DynamicArray.hpp" />
-    <ClInclude Include="tools\List.hpp" />
+    <ClInclude Include="TokensSimulator.h" />
+    <ClInclude Include="tools\PointerContainer.hpp" />
     <ClInclude Include="Vector.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

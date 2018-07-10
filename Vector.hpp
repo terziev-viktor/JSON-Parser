@@ -1,5 +1,4 @@
 #pragma once
-#include "tools\DynamicArray.hpp"
 #include <stdexcept>
 namespace tools
 {
@@ -13,25 +12,22 @@ namespace tools
 
 		// class T should have a proper operator= implemented
 		void add(const T & item);
-		const T & getAt(unsigned int index) const;
-		T & getAt(unsigned int index);
 		T & operator[](unsigned int index);
 		const T & operator[](unsigned int index) const;
-		Vector<T> & operator=(const Vector<T> & other);
 		bool operator==(const Vector<T> & other) const;
 		Vector<T> & operator+=(const Vector<T> & other);
-		Vector<T> & operator-=(const T & item);
 		Vector<T> & operator-=(unsigned int count);
 
-		int indexOf(const T & item);
-
-		void removeAt(unsigned int index);
-		void remove(const T & item);
-		const bool isEmpty() const;
+		int index_of(const T & item) const;
+		void remove_at(unsigned int index);
+		bool is_empty() const;
 		// sets the index to 0. Does not delete objects
 		void clear();
 		// returns count of elements in the array
-		const unsigned int count() const;
+		unsigned int count() const;
+		unsigned int capacity() const;
+		Vector<T>& operator=(const Vector<T>& other);
+
 		class Iterator
 		{
 		private:
@@ -67,26 +63,26 @@ namespace tools
 				++this->current;
 			}
 
-			bool hasNext() const
+			bool has_next() const
 			{
 				return this->current < this->last;
 			}
-			bool isDone() const
+			bool is_done() const
 			{
 				return this->current >= this->front + this->size;
 			}
-			const Iterator & operator++(int)
+			const Iterator operator++(int)
 			{
-				++this->current;
-				return *this;
+				const Iterator tmp(*this);
+				++this;
+				return tmp;
 			}
 			Iterator & operator++()
 			{
-				Iterator tmp = *this;
 				++this->current;
-				return tmp;
+				return *this;
+				
 			}
-
 			const Iterator & operator--(int)
 			{
 				Iterator tmp = *this;
@@ -137,34 +133,37 @@ namespace tools
 		static const unsigned int INIT_SIZE = 15;
 		unsigned int size;
 		unsigned int index;
-		T * buffer;
+		T * buffer = nullptr;
 
 		void expand();
 	};
 
 	template<class T>
 	inline Vector<T>::Vector()
+		:size(INIT_SIZE),index(0)
 	{
-		this->size = INIT_SIZE;
-		this->index = 0;
 		this->buffer = new T[INIT_SIZE];
 	}
 
 	template<class T>
 	inline Vector<T>::~Vector()
 	{
-		delete[] this->buffer;
+		if (this->buffer)
+		{
+			delete[] this->buffer;
+		}
 	}
 
 	template<class T>
 	inline Vector<T>::Vector(const Vector<T>& other)
 	{
+		this->clear();
 		this->size = other.count();
 		this->index = other.count();
 		this->buffer = new T[this->size];
 		for (unsigned int i = 0; i < this->index; i++)
 		{
-			this->buffer[i] = other.getAt(i);
+			this->buffer[i] = other[i];
 		}
 	}
 
@@ -180,42 +179,32 @@ namespace tools
 	}
 
 	template<class T>
-	inline const T & Vector<T>::getAt(unsigned int index) const
-	{
-		if (index < 0 || index >= this->index)
-		{
-			throw std::out_of_range("Index out of range");
-		}
-		return this->buffer[index];
-	}
-
-	template<class T>
-	inline T & Vector<T>::getAt(unsigned int index)
-	{
-		if (index < 0 || index >= this->index)
-		{
-			throw std::out_of_range("Index out of range");
-		}
-		return this->buffer[index];
-	}
-
-	template<class T>
 	inline T & Vector<T>::operator[](unsigned int index)
 	{
-		return this->getAt(index);
+		if (index < 0 || index >= this->index)
+		{
+			throw std::out_of_range("Index out of range");
+		}
+		return this->buffer[index];
 	}
 
 	template<class T>
 	inline const T & Vector<T>::operator[](unsigned int index) const
 	{
-		return this->getAt(index);
+		if (index < 0 || index >= this->index)
+		{
+			throw std::out_of_range("Index out of range");
+		}
+		return this->buffer[index];
 	}
 
 	template<class T>
 	inline Vector<T>& Vector<T>::operator=(const Vector<T>& other)
 	{
-		this->index = 0;
-		for (size_t i = 0; i < other.index; i++)
+		this->clear();
+		this->index = other.count();
+		this->size = other.capacity();
+		for (unsigned int i = 0; i < this->index; i++)
 		{
 			this->add(other[i]);
 		}
@@ -239,17 +228,11 @@ namespace tools
 	inline Vector<T>& Vector<T>::operator+=(const Vector<T>& other)
 	{
 		unsigned int count = other.count();
-		for (size_t i = 0; i < count; i++)
+		for (unsigned int i = 0; i < count; i++)
 		{
 			this->add(other[i]);
 		}
 		return *this;
-	}
-
-	template<class T>
-	inline Vector<T>& Vector<T>::operator-=(const T & item)
-	{
-		this->remove(item);
 	}
 
 	template<class T>
@@ -266,20 +249,21 @@ namespace tools
 	}
 
 	template<class T>
-	inline int Vector<T>::indexOf(const T & item)
+	inline int Vector<T>::index_of(const T & item) const
 	{
-		for (unsigned int i = 0; i < this->index; i++)
+		int ind = -1;
+		for (unsigned int i = 0; i < this->count(); i++)
 		{
-			if (this->buffer[i] == item)
+			if ((*this)[i] == item)
 			{
 				return i;
 			}
 		}
-		return -1;
+		return ind;
 	}
 
 	template<class T>
-	inline void Vector<T>::removeAt(unsigned int at)
+	inline void Vector<T>::remove_at(unsigned int at)
 	{
 		if (at < 0 || at >= this->index)
 		{
@@ -293,18 +277,7 @@ namespace tools
 	}
 
 	template<class T>
-	inline void Vector<T>::remove(const T & item)
-	{
-		int index = this->indexOf(item);
-		if (index == -1)
-		{
-			throw std::invalid_argument("Item does not exist");
-		}
-		this->removeAt(index);
-	}
-
-	template<class T>
-	inline const bool Vector<T>::isEmpty() const
+	inline bool Vector<T>::is_empty() const
 	{
 		return this->index == 0;
 	}
@@ -313,12 +286,20 @@ namespace tools
 	inline void Vector<T>::clear()
 	{
 		this->index = 0;
+		this->size = 0;
+		delete[] this->buffer;
 	}
 
 	template<class T>
-	inline const unsigned int Vector<T>::count() const
+	inline unsigned int Vector<T>::count() const
 	{
 		return this->index;
+	}
+
+	template<class T>
+	inline unsigned int Vector<T>::capacity() const
+	{
+		return this->size;
 	}
 
 	template<class T>
@@ -340,9 +321,9 @@ namespace tools
 		os << '(';
 		for (unsigned int i = 0; i < v.count() - 1; i++)
 		{
-			os << v.getAt(i) << "\n";
+			os << v[i] << "\n";
 		}
-		os << v.getAt(v.count() - 1) << ')';
+		os << v[v.count() - 1] << ')';
 		return os;
 	}
 }

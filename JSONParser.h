@@ -1,10 +1,9 @@
 #pragma once
-#include "ComponentFactory.h"
-#include <string>
-#include "Indexable.h"
+#include "Array.h"
+#include "Composite.h"
+using components::creators::CompositeCreator;
+using components::creators::ArrayCreator;
 using namespace components;
-using std::string;
-using factory::ComponentFactory;
 using namespace tools;
 using namespace components;
 
@@ -13,40 +12,13 @@ namespace interpreters
 	class JSONParser
 	{
 	public:
-		JSONParser();
-		
-		~JSONParser();
 		// Parses the string to json
 		// Returns true on at least one successful parsing
-		bool parse(const std::string & json);
-		bool parse(const char * json);
-		bool parse();
-		static Component * parseOne(const char * json);
-		// Loads a file for parsing
-		bool load(const char * path);
-		// Saves all parsed json objects to a file
-		bool save(const char * path, bool overrideFile = true, bool pretty = true) const;
-		bool save(const Component * item, const char * path, bool overrideFile = true, bool pretty = true) const;
-		// Finds all keys in json objects and all strings or numbers in arrays
-		// returns array of their values
-		Indexable * findAll(const char * key, const Indexable & in_object);
-
-		// getters
-		const Component * get(unsigned int index) const;
-		Component * get(unsigned int index);
-		const Indexable & operator[](unsigned int index) const;
-		Indexable & operator[](unsigned int index);
-
-		// Count of currently parsed elements
-		const unsigned int getParsedCount() const;
-		void add(Component * component);
-		void print() const;
-		const string & getFile() const;
-	private:
-		List<Component> * list;
-		string file;
-		bool fileLoaded;
-		bool fileExists(const char * path) const;
+		static Component * parse(const cstring & json);
+		static Array * parse_json_array(const cstring & json);
+		static Composite * parse_json(const cstring & json);
+		static JSON & parse_file(const cstring & path);
+		static bool file_exists(const cstring & path);
 	};
 }
 

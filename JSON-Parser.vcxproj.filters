@@ -19,12 +19,12 @@
     <Filter Include="Commands">
       <UniqueIdentifier>{8d7bd30c-4364-49fd-ab38-273d76d90ff8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{2543f600-db27-431f-be08-156f0024f686}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Composite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Leaf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -48,14 +48,17 @@
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Tokenizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Indexable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Commands.cpp">
       <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="cstring.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TokensSimulator.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Boolean.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -63,15 +66,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Composite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Leaf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tools\DynamicArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tools\List.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Array.h">
@@ -89,23 +83,29 @@
     <ClInclude Include="ComponentFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tokenizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="json_exceptions.hpp">
       <Filter>Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="Indexable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Modifiable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Commands.h">
       <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.hpp">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cstring.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="tools\PointerContainer.hpp">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TokensSimulator.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Boolean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

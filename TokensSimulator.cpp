@@ -28,18 +28,18 @@ void tools::TokensSimulator::next()
 
 bool tools::TokensSimulator::is_done() const
 {
-	return this->pos == this->tokens_str.get_length();
+	return this->pos == (this->tokens_str.get_length());
 }
 
 int tools::TokensSimulator::skip_until(const cstring & tokens)
 {
 	int skipped = 0;
-	while (this->pos < this->tokens_str.get_length() && !tokens.contains(this->tokens_str[this->pos]))
+	while (!this->is_done() && !tokens.contains(this->tokens_str[this->pos]))
 	{
-		++this->pos;
+		this->next();
 		++skipped;
 	}
-	if (this->pos == tokens_str.get_length())
+	if (this->is_done())
 	{
 		return -1;
 	}

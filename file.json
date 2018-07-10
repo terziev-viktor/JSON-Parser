@@ -1,4 +1,4 @@
-{"widget": {
+{
     "debug": "on",
     "window": {
         "title": "Sample Konfabulator Widget",
@@ -34,6 +34,4 @@
           ]
         }
       }
-}} 
-
-["arr", 123, 13.2]
+}

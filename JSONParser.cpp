@@ -1,123 +1,43 @@
+#pragma once
 #include "JSONParser.h"
 #include <fstream>
 #include "json_exceptions.hpp"
+#include "ComponentFactory.h"
+using factory::ComponentFactory;
 using namespace json_exceptions;
 using std::ifstream;
 using namespace interpreters;
 
-JSONParser::JSONParser()
-{
-	this->list = nullptr;
-	this->fileLoaded = false;
-}
-
-JSONParser::~JSONParser()
-{
-	delete this->list;
-}
-
-Indexable * interpreters::JSONParser::findAll(const char * key, const Indexable & obj)
-{
-	return nullptr;
-}
-
-const Component * JSONParser::get(unsigned int index) const
-{
-	return this->list->getAt(index);
-}
-
-Component * interpreters::JSONParser::get(unsigned int index)
-{
-	return this->list->getAt(index);
-}
-
-const unsigned int interpreters::JSONParser::getParsedCount() const
-{
-	if (this->list)
-	{
-		return this->list->count();
-	}
-	return 0;
-}
-
-const Indexable & interpreters::JSONParser::operator[](unsigned int index) const
-{
-	if (index < 0 || index >= this->getParsedCount())
-	{
-		throw json_exception("Invalid index");
-	}
-	return dynamic_cast<const Indexable&>(*this->get(index));
-}
-
-Indexable & interpreters::JSONParser::operator[](unsigned int index)
-{
-	if (index < 0 || index >= this->getParsedCount())
-	{
-		throw json_exception("Invalid index");
-	}
-	return dynamic_cast<Indexable&>(*this->get(index));
-}
-
-void JSONParser::add(Component * component)
-{
-	this->list->add(component);
-}
-
-void JSONParser::print() const
-{
-	for (unsigned int i = 0; i < this->list->count(); i++)
-	{
-		this->list->getAt(i)->print();
-	}
-}
-
-const string & interpreters::JSONParser::getFile() const
-{
-	return this->file;
-}
-
-bool interpreters::JSONParser::fileExists(const char * path) const
+bool interpreters::JSONParser::file_exists(const cstring & path)
 {
 	std::ifstream f;
-	f.open(path);
+	f.open(path.get_as_char_array());
 	return f.good();
 }
 
-bool JSONParser::parse(const std::string & json)
+Component * interpreters::JSONParser::parse(const cstring & json)
 {
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
-	this->list = ComponentFactory::getFactory().createFromTokens(i);
-	return this->list->count() > 0;
-}
-
-bool JSONParser::parse(const char * json)
-{
-	std::string str(json);
-	return this->parse(str);
-}
-
-bool interpreters::JSONParser::parse()
-{
-	if (!this->fileLoaded)
+	if (json.get_length() == 0)
 	{
-		return false;
+		return nullptr;
 	}
-	return this->parse(this->file);
+	TokensSimulator tokens(json);
+	unsigned int line = 1;
+	line += tokens.skip_whitespace();
+	Component * p = ComponentFactory::getFactory().createFromTokens(tokens, line);
+	return p;
 }
 
-Component * interpreters::JSONParser::parseOne(const char * json)
+components::Array * interpreters::JSONParser::parse_json_array(const cstring & json)
 {
-	Vector<Token> tokens = Tokenizer::tokenize(json);
-	Vector<Token>::Iterator i = tokens.createIterator();
+	TokensSimulator tokens(json);
 	unsigned int line = 1;
-	ComponentCreator::skipWhitespace(i, line);
-	Component * p = ComponentFactory::getFactory().createNextFromTokens(i, line);
+	line += tokens.skip_whitespace();
+	Array * p = ArrayCreator::create_array(tokens, line);
 	if (p)
 	{
-		++i;
-		ComponentCreator::skipWhitespace(i, line);
-		if (!i.isDone())
+		line += tokens.skip_whitespace();
+		if (!tokens.is_done())
 		{
 			throw bad_json_exception("End of string/file expected", line);
 		}
@@ -126,103 +46,55 @@ Component * interpreters::JSONParser::parseOne(const char * json)
 	return nullptr;
 }
 
-bool interpreters::JSONParser::load(const char * path)
+Composite * interpreters::JSONParser::parse_json(const cstring & json)
 {
-	ifstream in;
-	char buffer[1025];
-	in.open(path);
+	TokensSimulator tokens(json);
+	unsigned int line = 1;
+	line += tokens.skip_whitespace();
+	Composite * p = CompositeCreator::create_json(tokens, line);
+	if (p)
+	{
+		line += tokens.skip_whitespace();
+		if (!tokens.is_done())
+		{
+			throw bad_json_exception("End of string/file expected", line);
+		}
+		return p;
+	}
+	return nullptr;
+}
+
+JSON & interpreters::JSONParser::parse_file(const cstring & path)
+{
+	if (!JSONParser::file_exists(path))
+	{
+		throw json_exception("Json file does not exist");
+	}
+	if (!path.ends_with(".json"))
+	{
+		throw json_exception("File is not a .json file");
+	}
+	std::ifstream in;
+	in.open(path.get_as_char_array());
 	if (!in)
 	{
-		in.close();
-		return false;
+		throw json_exception("Could not open json file");
 	}
+	char buffer[1024];
+	cstring file;
 	while (in)
 	{
-		in.getline(buffer, 1024);
-		if (in.gcount() > 0)
-		{
-			buffer[in.gcount() - 1] = '\n';
-			buffer[in.gcount()] = '\0';
-			this->file += buffer;
-		}
+		in.read(buffer, 1021);
+		int count = in.gcount();
+		buffer[count] = '\0';
+		file += buffer;
 	}
-	this->fileLoaded = true;
-	return true;
-}
-
-bool interpreters::JSONParser::save(const char * path, bool overrideFile, bool pretty) const
-{
-	for (size_t i = 0; i < this->list->count(); i++)
+	std::cout << file << std::endl;
+	Component * parsed = JSONParser::parse(file);
+	JSON * casted = dynamic_cast<JSON *>(parsed);
+	if (!casted)
 	{
-		bool success = this->save(this->list->getAt(i), path, false, pretty);
-		if (!success)
-		{
-			return false;
-		}
+		throw json_exception("Json file does not contain an Indexable object");
 	}
-	return true;
-}
-
-bool interpreters::JSONParser::save(const Component * item, const char * path, bool overrideFile, bool pretty) const
-{
-	size_t len = strlen(path);
-	if (path[len - 1] != 'n' || path[len - 2] != 'o' || path[len - 3] != 's' || path[len - 4] != 'j' || path[len - 5] != '.')
-	{
-		throw json_exception("path must be .json file");
-		return false;
-	}
-	std::ofstream jsonFile;
-	if (overrideFile)
-	{
-		jsonFile.open(path);
-	}
-	else
-	{
-		jsonFile.open(path, std::ios::app);
-	}
-
-	if (!jsonFile)
-	{
-		throw json_exception("Could not open file");
-		return false;
-	}
-	item->print(jsonFile, 0, pretty);
-	jsonFile.close();
-	return true;
-}
-
-//Array * interpreters::JSONParser::findAll(const char * key)
-//{
-//	Array * arr = new Array();
-//	for (size_t i = 0; i < this->list->count(); i++)
-//	{
-//		Composite * c = this->getAsJsonObject(i);
-//		if (c && c->hasKey(key))
-//		{
-//			arr->add(c->get(key));
-//		}
-//		else
-//		{
-//			Array * casted = this->getAsJsonArray(i);
-//			Component * out;
-//			bool contains = casted->contains(key, out);
-//			if (casted && contains)
-//			{
-//				arr->add(out);
-//			}
-//		}
-//	}
-//	return arr;
-//}
-
-bool contains(const char * str, int size, const char token)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (str[i] == token)
-		{
-			return true;
-		}
-	}
-	return false;
+	return *casted;
 }

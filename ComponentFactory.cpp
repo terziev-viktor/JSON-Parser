@@ -1,6 +1,5 @@
+#pragma once
 #include "ComponentFactory.h"
-#include "json_exceptions.hpp"
-using json_exceptions::bad_json_exception;
 
 factory::ComponentFactory & factory::ComponentFactory::getFactory()
 {
@@ -10,57 +9,36 @@ factory::ComponentFactory & factory::ComponentFactory::getFactory()
 
 void factory::ComponentFactory::registerCreator(const ComponentCreator * creator)
 {
-	if (index < 10)
+	if (this->index == this->max_creators_count)
 	{
-		creators[index] = creator;
-		++index;
+		this->expand();
 	}
+	this->creators[index] = creator;
+	++index;
 }
 
-List<Component> * factory::ComponentFactory::createFromTokens(Vector<Token>::Iterator & i)
-{
-	List<Component> * result = new List<Component>();
-	unsigned int line_number = 1;
-	while (!i.isDone())
-	{
-		ComponentCreator::skipWhitespace(i, line_number);
-		if (i.isDone())
-		{
-			return result;
-		}
-		unsigned int old = line_number;
-		Component * next = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
-		if (next == nullptr)
-		{
-			delete result;
-			throw bad_json_exception("Unexpected token", old);
-		}
-		result->add(next);
-		++i;
-	}
-	if (result->count() == 0)
-	{
-		delete result;
-		return nullptr;
-	}
-	return result;
-}
-
-Component * factory::ComponentFactory::createNextFromTokens(Vector<Token>::Iterator & i, unsigned int & line_number)
+Component * factory::ComponentFactory::createFromTokens(TokensSimulator & tokens, unsigned int & line_number)
 {
 	Component * next = nullptr;
-	for (size_t j = 0; j < this->index; j++)
+	for (int j = 0; j < this->index; j++)
 	{
-		if (this->creators[j]->getBeginToken().getName() == i->getName())
+		next = this->creators[j]->createComponent(tokens, line_number);
+		if (next)
 		{
-			next = this->creators[j]->createComponent(i, line_number);
-
-			if (this->creators[j]->getEndToken().getName() != i->getName())
-			{
-				throw bad_json_exception("Unexpected token", line_number);
-			}
 			return next;
 		}
 	}
-	return nullptr;
+	throw json_exception("Unknown json");
+}
+
+void factory::ComponentFactory::expand()
+{
+	this->max_creators_count *= 2;
+	const ComponentCreator * * new_creators_buffer = new const ComponentCreator*[this->max_creators_count];
+	for (int i = 0; i < this->index; i++)
+	{
+		new_creators_buffer[i] = this->creators[i];
+	}
+	delete this->creators;
+	this->creators = new_creators_buffer;
 }

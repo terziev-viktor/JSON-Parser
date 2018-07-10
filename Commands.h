@@ -1,94 +1,97 @@
 #pragma once
-#include "String.h"
 #include "JSONParser.h"
-using namespace interpreters;
-using components::String;
-
+using interpreters::JSONParser;
 namespace commands
 {
 	class Command
 	{
 	public:
-		Command();
-		Command(const char * trigger);
-		~Command();
-		void setTrigger(const char * value);
-		void setTrigger(const String & value);
-		const String & getTrigger() const;
-		virtual void execute(Indexable *& current, JSONParser & parser) = 0;
+		Command(const cstring & trigger);
+		void set_trigger(const cstring & value);
+		const cstring & get_trigger() const;
+		virtual void execute(JSON * & parsed_json, JSON * & current) = 0;
 	protected:
-		Vector<String> readArgs(char delim) const;
-		String readArg() const;
+		Vector<cstring> read_args(const char * delim) const;
+		cstring read_arg() const;
 	private:
-		String trigger;
+		cstring trigger;
 	};
 	class Help : public Command
 	{
 	public:
 		Help() :Command("help") {}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Load : public Command
 	{
 	public:
 		Load() : Command("load"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Select : public Command
 	{
 	public:
 		Select() : Command("select"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Print : public Command
 	{
 	public:
 		Print() : Command("print"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Save : public Command
 	{
 	public:
 		Save():Command("save"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
-	class ArrayAdd : public Command
+	class Add : public Command
 	{
 	public:
-		ArrayAdd() : Command("array_add"){}
-		void execute(Indexable *& current, JSONParser & parser);
-	};
-
-	class JsonAdd : public Command
-	{
-	public:
-		JsonAdd() : Command("json_add"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		Add() : Command("add"){}
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Update : public Command
 	{
 	public:
 		Update() :Command("update"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Swap : public Command
 	{
 	public:
 		Swap() :Command("swap"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
 	};
 
 	class Remove : public Command
 	{
 	public:
 		Remove() : Command("remove"){}
-		void execute(Indexable *& current, JSONParser & parser);
+		void execute(JSON * & parsed_json, JSON * & current);
+	};
+
+	class Equal : public Command
+	{
+	public:
+		Equal():Command("equal"){}
+		void execute(JSON * & parsed_json, JSON * & current);
+	};
+
+	class Find : public Command
+	{
+	public:
+		Find() :Command("find") { }
+		void execute(JSON * & parsed_json, JSON * & current);
+	private:
+		void search(Vector<cstring> & keys_to_search);
 	};
 }

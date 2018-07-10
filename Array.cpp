@@ -1,188 +1,47 @@
+#pragma once
 #include "Array.h"
-#include "Number.h"
-using components::Number;
-#include <iostream>
 #include <fstream>
-#include <stdarg.h>
 using std::cout;
-#include "String.h"
 #include "ComponentFactory.h"
-#include "json_exceptions.hpp"
 #include <cstdarg>
-using json_exceptions::bad_json_exception;
-using json_exceptions::invalid_key_name_exception;
+#include "JSONParser.h"
+using interpreters::JSONParser;
 using namespace components;
 using factory::ComponentFactory;
+using creators::ArrayCreator;
 
-static const ArrayCreator theArrayCreator;
-
-components::Array::Array()
-{
-
-}
-
-components::Array::Array(const Array & other)
-{
-	this->copyFrom(other);
-}
-
-components::Array::Array(const Indexable & other)
-{
-	const Array & casted = dynamic_cast<const Array &>(other);
-	this->copyFrom(casted);
-}
+static const creators::ArrayCreator theArrayCreator;
 
 components::Array::~Array()
 {
+	this->values.delete_all_content();
 }
 
-const components::Component & components::Array::get(int index) const
+bool components::Array::is_empty() const
 {
-	return *this->values.getAt(index);
+	return this->count() == 0;
 }
 
-Component & components::Array::get(int at)
-{
-	return *this->values.getAt(at);
-}
-
-const Component & components::Array::get(const char * key) const
-{
-	int parsed;
-	if (Number::tryParse(key, parsed))
-	{
-		return *this->values.getAt(parsed);
-	}
-	throw invalid_key_name_exception(key);
-}
-
-Component & components::Array::get(const char * key)
-{
-	int parsed;
-	if (Number::tryParse(key, parsed))
-	{
-		return *this->values.getAt(parsed);
-	}
-	throw invalid_key_name_exception(key);
-}
-
-Indexable & components::Array::operator=(const Indexable & other)
-{
-	const Array & casted = dynamic_cast<const Array &>(other);
-	return (*this = casted);
-}
-
-Indexable & components::Array::operator+=(const Indexable & other)
-{
-	const Array & casted = dynamic_cast<const Array&>(other);
-	return (*this += casted);
-}
-
-void components::Array::update(const char * key, const char * json)
-{
-	int index;
-	bool success = Number::tryParse(key, index);
-	if (!success)
-	{
-		throw invalid_key_name_exception(key);
-	}
-	this->update(index, json);
-}
-
-void components::Array::update(int index, const char * json)
-{
-	Component * parsed = JSONParser::parseOne(json);
-	if (parsed)
-	{
-		this->update(index, parsed);
-	}
-	else
-	{
-		try
-		{
-			Number * n = new Number(json);
-			this->update(index, n);
-		}
-		catch (const std::exception&)
-		{
-			this->update(index, new String(json));
-		}
-	}
-}
-
-void components::Array::update(int index, double number)
-{
-	Number *n = new Number();
-	this->update(index, n);
-}
-
-void components::Array::add(Component * item)
-{
-	this->values.add(item);
-}
-
-void components::Array::add(const char * json)
-{
-	Component * parsed = JSONParser::parseOne(json);
-	if (parsed)
-	{
-		this->add(parsed);
-	}
-	else
-	{
-		try
-		{
-			Number * n = new Number(json);
-			this->add(n);
-		}
-		catch (const std::exception& e)
-		{
-			this->add(new String(json));
-		}
-
-	}
-}
-
-void components::Array::add(const char * json1, const char * json2)
-{
-	this->add(json1);
-	this->add(json2);
-}
-
-const unsigned int components::Array::size() const
+unsigned int components::Array::count() const
 {
 	return this->values.count();
 }
 
-const bool components::Array::empty() const
+void components::Array::clear()
 {
-	return this->size() == 0;
+	this->values.clear();
 }
 
-const bool components::Array::contains(const char * item, Component * out) const
+int components::Array::index_of(const Component & item) const
 {
-	Component * parsed = JSONParser::parseOne(item);
-	if (!parsed)
+	for (unsigned int i = 0; i < this->values.count(); i++)
 	{
-		try
+		if (item.equals(*this->values[i]))
 		{
-			parsed = new Number(item);
-		}
-		catch (const std::exception&)
-		{
-			parsed = new String(item);
+			return i;
 		}
 	}
-	for (size_t i = 0; i < this->values.count(); i++)
-	{
-		if (*parsed == *this->values.getAt(i))
-		{
-			out = parsed;
-			return true;
-		}
-	}
-	delete parsed;
-	return false;
+	return -1;
 }
 
 Array & components::Array::operator=(const Array & other)
@@ -191,24 +50,12 @@ Array & components::Array::operator=(const Array & other)
 	{
 		return *this;
 	}
-	this->values.clear();
-	for (size_t i = 0; i < other.size(); i++)
+	this->values.delete_all_content();
+	for (unsigned int i = 0; i < other.count(); i++)
 	{
-		this->values.add(other.get(i).copy());
+		this->values.add(other[i].copy());
 	}
 	return *this;
-}
-
-Component & components::Array::operator=(const Component & other)
-{
-	const Array & casted = dynamic_cast<const Array&>(other);
-	return *this = casted;
-}
-
-Component & components::Array::operator+=(const Component & other)
-{
-	const Array & casted = dynamic_cast<const Array &>(other);
-	return (*this += casted);
 }
 
 Component * components::Array::copy() const
@@ -216,41 +63,24 @@ Component * components::Array::copy() const
 	Array * arr = new Array();
 	for (size_t i = 0; i < this->values.count(); i++)
 	{
-		arr->add(this->values.getAt(i)->copy());
+		arr->add(*this->values[i]);
 	}
 	return arr;
 }
 
 Array & components::Array::operator+=(const Array & other)
 {
-	for (size_t i = 0; i < other.values.count(); i++)
+	for (unsigned int i = 0; i < other.values.count(); i++)
 	{
-		this->values.add(other.values.getAt(i)->copy());
+		this->values.add(other.values[i]->copy());
 	}
 	return *this;
 }
+
 Array & components::Array::operator-=(unsigned int index)
 {
-	this->values.removeAt(index);
+	this->values.set_at(index, nullptr, true);
 	return *this;
-}
-
-bool components::Array::operator==(const Component & other) const
-{
-	try
-	{
-		const Array & cast = dynamic_cast<const Array&>(other);
-		return *this == cast;
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
-
-bool components::Array::operator!=(const Component & other) const
-{
-	return !(*this == other);
 }
 
 bool components::Array::operator==(const Array & other) const
@@ -259,9 +89,9 @@ bool components::Array::operator==(const Array & other) const
 	{
 		return false;
 	}
-	for (size_t i = 0; i < this->values.count(); i++)
+	for (unsigned int i = 0; i < this->values.count(); i++)
 	{
-		if (!(*this->values.getAt(i) == *other.values.getAt(i)))
+		if (!(this->values[i]->equals(*other.values[i])))
 		{
 			return false;
 		}
@@ -269,214 +99,221 @@ bool components::Array::operator==(const Array & other) const
 	return true;
 }
 
+bool components::Array::operator!=(const Array & other) const
+{
+	return !(*this == other);
+}
+
+Component & components::Array::operator[](unsigned int index)
+{
+	return *this->values[index];
+}
+
+const Component & components::Array::operator[](unsigned int index) const
+{
+	return *this->values[index];
+}
+
+JSON & components::Array::get(const String & str)
+{
+	int index;
+	if (str.to_int(index))
+	{
+		Component * item = this->values[index];
+		JSON * casted = dynamic_cast<JSON *>(item);
+		if (!casted)
+		{
+			throw invalid_key_name_exception(str.get_value());
+		}
+		return *casted;
+	}
+	throw invalid_key_name_exception(str.get_value());
+}
+
+const JSON & components::Array::get(const String & str) const
+{
+	int index;
+	if (str.to_int(index))
+	{
+		const Component * item = this->values[index];
+		const JSON * casted = dynamic_cast<const JSON *>(item);
+		if (!casted)
+		{
+			throw invalid_key_name_exception(str.get_value());
+		}
+		return *casted;
+	}
+	throw invalid_key_name_exception(str.get_value());
+}
+
 void components::Array::add(unsigned int items_count, ...)
 {
+	JSONParser parser;
 	va_list args;
 	va_start(args, items_count);
 	for (size_t i = 0; i < items_count; i++)
 	{
-		const char * next_json = va_arg(args, const char *);
-		if (next_json[0])
+		try
 		{
-			this->add(next_json);
+			const char * next_json_str = va_arg(args, const char *);
+			Component * next_json = parser.parse(next_json_str);
+			if (!next_json)
+			{
+				
+			}
+			this->add(*next_json);
+			delete next_json;
+		}
+		catch (const std::exception&)
+		{
+			va_end(args);
+			throw json_exception("Invalid json arguments for add method of Array");
 		}
 	}
 	va_end(args);
 }
 
-void components::Array::update(const char * key, double number)
+void components::Array::update(const String& str, const Component & new_value)
 {
-	int n;
-	if (Number::tryParse(key, n))
+	int index;
+	if (!str.to_int(index))
 	{
-		this->update(n, number);
-		return;
+		throw invalid_key_name_exception(str.get_value());
 	}
-	throw invalid_key_name_exception("Invalid key for array index");
+	this->values.set_at(index, new_value.copy(), true);
 }
 
-void components::Array::update(const char * key, Component * new_value)
+void components::Array::remove(const String& str)
 {
-	int n;
-	if (Number::tryParse(key, n))
+	int index;
+	if (!str.to_int(index))
 	{
-		this->update(n, new_value);
+		throw invalid_key_name_exception(str.get_value());
 	}
-	throw invalid_key_name_exception("Invalid key for array index");
+	this->values.delete_at(index);
 }
 
-void components::Array::update(int index, Component * new_value)
-{
-	this->values.setAt(index, new_value);
-}
-void components::Array::remove(const char * index)
-{
-	int n;
-	if (Number::tryParse(index, n))
-	{
-		this->remove(n);
-	}
-	else
-	{
-		throw invalid_key_name_exception("Invalid key for array index");
-	}
-
-}
-void components::Array::remove(int index)
-{
-	if (index >= 0)
-	{
-		this->values.removeAt(index);
-	}
-	else
-	{
-		throw std::out_of_range("Index out of rande");
-	}
-}
-
-void components::Array::swap(const char * key1, const char * key2)
+void components::Array::swap(const String& str1, const String& str2)
 {
 	int index1, index2;
-	if (Number::tryParse(key1, index1) && Number::tryParse(key2, index2))
+	if (!str1.to_int(index1))
 	{
-		this->swap(index1, index2);
+		throw invalid_key_name_exception(str1.get_value());
 	}
-	throw invalid_key_name_exception("invalid keys for swap function");
+	if (!str2.to_int(index2))
+	{
+		throw invalid_key_name_exception(str2.get_value());
+	}
+	Component * a = this->values[index1];
+	Component * b = this->values[index2];
+	this->values.set_at(index1, b, false);
+	this->values.set_at(index2, a, false);
 }
 
-void components::Array::swap(unsigned int index1, unsigned int index2)
+void components::Array::add(const Component & item)
 {
-	Component * a = this->values.getAt(index1);
-	Component * b = this->values.getAt(index2);
-	this->values.setAt(index1, b, false);
-	this->values.setAt(index2, a, false);
+	this->values.add(item.copy());
 }
 
-Indexable & components::Array::operator[](int index)
-{
-	return dynamic_cast<Indexable&>(this->get(index));
-}
-Indexable & components::Array::operator[](const char * key)
-{
-	return dynamic_cast<Indexable&>(this->get(key));
-}
-const Indexable & components::Array::operator[](const char * key) const
-{
-	return dynamic_cast<const Indexable&>(this->get(key));
-}
-const Indexable & components::Array::operator[](int index) const
-{
-	return dynamic_cast<const Indexable&>(this->get(index));
-}
-// override
-
-void components::Array::print(std::ostream & out, unsigned short tab_index, bool pretty) const
+void components::Array::print(std::ostream & out, bool pretty, unsigned int tab_index) const
 {
 	out << '[';
 	if (this->values.count() > 0)
 	{
-		for (size_t i = 0; i < this->values.count() - 1; i++)
+		for (unsigned int i = 0; i < this->values.count() - 1; i++)
 		{
-			this->values.getAt(i)->print(out, tab_index, pretty);
+			this->values[i]->print(out, pretty, tab_index);
 			out << ", ";
 		}
-
-		this->values[this->values.count() - 1]->print(out, tab_index, pretty);
+		this->values[this->values.count() - 1]->print(out, pretty, tab_index);
 	}
 	out << ']';
+	
 }
-void components::Array::copyFrom(const Array & other)
+
+bool components::Array::equals(const Component & other) const
 {
-	this->values.clear();
-	for (size_t i = 0; i < other.values.count(); i++)
+	return false;
+}
+
+cstring components::Array::tell_type() const
+{
+	return "Array";
+}
+
+Component * components::creators::ArrayCreator::createComponent(TokensSimulator & tokens, unsigned int & line_number) const
+{
+	return ArrayCreator::create_array(tokens, line_number);
+}
+
+Array * components::creators::ArrayCreator::create_array(TokensSimulator & tokens, unsigned int & line_number)
+{
+	if (tokens.get() != '[')
 	{
-		this->values.add(other.values.getAt(i)->copy());
+		return nullptr;
 	}
-}
-void components::Array::print(unsigned short tab_index, bool pretty) const
-{
-	this->print(cout, tab_index, pretty);
-}
-
-components::ArrayCreator::ArrayCreator()
-	:ComponentCreator(Token(TokenNames::ArrayBegin, '['), Token(TokenNames::ArrayEnd, ']'))
-{
-}
-
-components::Component * components::ArrayCreator::createComponent(Vector<Token>::Iterator & i, unsigned int & line_number) const
-{
+	tokens.next();
+	line_number += tokens.skip_whitespace();
+	if (tokens.is_done())
+	{
+		throw bad_json_exception("Unexpected end of file/string", line_number);
+	}
 	Array * result = new Array();
-	// in current pos of i should be token '['
-	if (i->getName() != TokenNames::ArrayBegin)
+	while (tokens.get() != ']')
 	{
-		throw bad_json_exception("Expected begin array token", line_number);
-	}
-	++i;
-	while (i->getName() != TokenNames::ArrayEnd)
-	{
-		ComponentCreator::skipWhitespace(i, line_number);
-
-		if (i->getName() == TokenNames::DoubleQuote)
+		line_number += tokens.skip_whitespace();
+		if (tokens.is_done())
 		{
-			++i;// skipping double quote
-			String * s = new String(i->getValue());
-			result->add(s);
-			++i;
-			if (i->getName() != TokenNames::DoubleQuote)
-			{
-				throw bad_json_exception("Expected double quote", line_number);
-			}
-			++i;// skipping double quote
+			delete result;
+			throw bad_json_exception("Unexpected end of file/string", line_number);
 		}
-		else if (i->getName() == TokenNames::StringOrNumber)
+		Component * item;
+		try
 		{
-			try
+			item = ComponentFactory::getFactory().createFromTokens(tokens, line_number);
+		}
+		catch (const std::exception&)
+		{
+			delete result;
+			throw;
+		}
+		result->add(*item);
+		delete item;
+		line_number += tokens.skip_whitespace();
+		if (tokens.is_done())
+		{
+			delete result;
+			throw bad_json_exception("Unexpected end of file or object", line_number);
+		}
+		if (tokens.get() == ',')
+		{
+			int old = line_number;
+			tokens.next();
+			line_number += tokens.skip_whitespace();
+			if (tokens.get() == ']')
 			{
-				Number * n = new Number(i->getValue());
-				result->add(n);
-				++i;
+				delete result;
+				throw bad_json_exception("Unexpected comma", old);
 			}
-			catch (const std::invalid_argument &)
+			else
 			{
-				throw bad_json_exception("Error converting to number", line_number);
+				continue;
 			}
 		}
 		else
 		{
-			Component * complex = ComponentFactory::getFactory().createNextFromTokens(i, line_number);
-			if (complex == nullptr)
+			line_number += tokens.skip_whitespace();
+			if (tokens.get_next() != ']')
 			{
-				throw bad_json_exception("Unexpected or unknown token", line_number);
-				return nullptr;
-			}
-			result->add(complex);
-			++i;
-		}
-		ComponentCreator::skipWhitespace(i, line_number);
-		if (i->getName() != Comma)
-		{
-			ComponentCreator::skipWhitespace(i, line_number);
-			if (i->getName() != ArrayEnd)
-			{
-				throw bad_json_exception("Expected comma or array end token", line_number);
+				delete result;
+				throw bad_json_exception("Expected end of array token ']'", line_number);
 			}
 			return result;
 		}
-		else
-		{
-			++i;
-			ComponentCreator::skipWhitespace(i, line_number);
-			if (i->getName() == ArrayEnd)
-			{
-				throw bad_json_exception("Unexpected token", line_number);
-			}
-		}
+		tokens.next();
+		line_number += tokens.skip_whitespace();
 	}
+	tokens.next();
 	return result;
 }
 
-Array components::operator+(const Array & left, const Array & right)
-{
-
-	return Array(left) += right;
-}

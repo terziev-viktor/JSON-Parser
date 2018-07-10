@@ -1,8 +1,10 @@
 #include "Commands.h"
 using namespace commands;
-using std::cin;
+#include "JSONParser.h"
 using std::cout;
+using std::cin;
 using std::endl;
+using interpreters::JSONParser;
 // This is a .NET solution
 // I'm using the Composite OOP Design Pattern
 // Source::https://www.oodesign.com/composite-pattern.html
@@ -12,45 +14,59 @@ using std::endl;
 void run_demo()
 {
 	JSONParser parser;
-	Indexable * current = nullptr;
-	List <Command> executable_commands;
+	JSON * current = nullptr;
+	JSON * parsed = nullptr;
+	PointerContainer<Command> executable_commands;
 	executable_commands.add(new Help());
 	executable_commands.add(new Load());
 	executable_commands.add(new Select());
 	executable_commands.add(new Print());
 	executable_commands.add(new Save());
-	executable_commands.add(new ArrayAdd());
-	executable_commands.add(new JsonAdd());
+	executable_commands.add(new Add());
 	executable_commands.add(new Update());
 	executable_commands.add(new Swap());
 	executable_commands.add(new Remove());
+	executable_commands.add(new Equal());
+	executable_commands.add(new Find());
 
 	while (true)
 	{
-		try
+		cstring inp;
+		cout << ">";
+		cin >> inp;
+		if (inp == "exit")
 		{
-			char inp[20];
-			cout << ">";
-			cin >> inp;
-			cin.ignore();
-			if (strcmp(inp, "exit") == 0)
+			return;
+		}
+		bool is_command = false;
+		for (unsigned int i = 0; i < executable_commands.count(); i++)
+		{
+			if (executable_commands[i]->get_trigger() == inp)
 			{
-				return;
-			}
-			for (size_t i = 0; i < executable_commands.count(); i++)
-			{
-				if (executable_commands.getAt(i)->getTrigger() == inp)
+				is_command = true;
+				try
 				{
-					executable_commands.getAt(i)->execute(current, parser);
+					executable_commands[i]->execute(parsed, current);
 					break;
 				}
+				catch (const json_exception& e)
+				{
+					e.log(cout);
+				}
 			}
-			cout << endl;
 		}
-		catch (const json_exception& e)
+		if (!is_command)
 		{
-			e.log(cout);
+			cout << inp << " is not a command. Type \"help\" to view all available commands";
 		}
+		cout << endl;
+	}
+
+	// deallocate memory
+	executable_commands.delete_all_content();
+	if (parsed)
+	{
+		delete parsed;
 	}
 }
 
