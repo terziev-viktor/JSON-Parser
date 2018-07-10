@@ -2,7 +2,9 @@
 This is my 1st course project in FMI.
 
 1. Reading from a file  
-   The program reads a json from a .txt or .json file. Creates a list of all json object in the file  
+   The program reads a json from a .json file.  
+2. Printing  
+   Any object can be printed on given ostream  
 2. Validation  
    The program validates the input and gives feedback on any error. What exactly is the error and where did it occur. 
 3. Edit  
@@ -14,7 +16,7 @@ This is my 1st course project in FMI.
 6. Swap  
    Swaps values of two keys  
    
-Each object can be compared to other objects. Objects can also modified, indexed swapped, printed...  
+Each object can be compared to other objects. Objects can also be modified, indexed, swapped, printed...  
 
 ## The OOP Design
 The OOP Designs I'm using are Composite, Abstract Factory and something that looks like an Interpreter :D
