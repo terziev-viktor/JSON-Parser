@@ -92,6 +92,7 @@ namespace commands
 		Find() :Command("find") { }
 		void execute(JSON * & parsed_json, JSON * & current);
 	private:
-		void search(Vector<cstring> & keys_to_search);
+		void search(Vector<cstring> & keys_to_search, const Composite * & current);
+		Array arr;
 	};
 }

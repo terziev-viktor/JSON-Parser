@@ -49,9 +49,9 @@ void run_demo()
 					executable_commands[i]->execute(parsed, current);
 					break;
 				}
-				catch (const json_exception& e)
+				catch (const std::exception& e)
 				{
-					e.log(cout);
+					cout << e.what();
 				}
 			}
 		}

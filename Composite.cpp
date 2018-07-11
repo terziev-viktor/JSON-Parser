@@ -85,15 +85,14 @@ void components::Composite::add(unsigned int key_value_pairs_count, ...)
 			{
 				break;
 			}
-			this->keys.add(key);
+			this->keys.add(cstring(key));
 			this->values.add(parsed);
 		}
 		catch (const std::exception&)
 		{
 			va_end(args);
-			throw json_exception("Invalid json arguments for add method of Composite");
+			throw;
 		}
-		
 	}
 	va_end(args);
 }
@@ -136,7 +135,7 @@ void components::Composite::swap(const String & key1, const String & key2)
 
 JSON & components::Composite::get(const String & key)
 {
-	Component & item = (*this)[key.get_value()];
+	Component & item = (*this)[key];
 	JSON * casted = dynamic_cast<JSON *>(&item);
 	if (!casted)
 	{
@@ -147,7 +146,7 @@ JSON & components::Composite::get(const String & key)
 
 const JSON & components::Composite::get(const String & key) const
 {
-	const Component & item = (*this)[key.get_value()];
+	const Component & item = (*this)[key];
 	const JSON * casted = dynamic_cast<const JSON *>(&item);
 	if (!casted)
 	{

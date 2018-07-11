@@ -61,9 +61,10 @@ void commands::Load::execute(JSON * & parsed_json, JSON * &  current)
 {
 	cstring arg = this->read_arg();
 	parsed_json = &JSONParser::parse_file(arg);
+	current = parsed_json;
 	if (!parsed_json)
 	{
-		throw bad_json_exception("Expected json object begin tokne '{' at the beginning of the file", 1);
+		throw bad_json_exception("Expected json object begin token '{' at the beginning of the .json file", 1);
 	}
 }
 
@@ -82,7 +83,7 @@ void commands::Select::execute(JSON * &  parsed_json, JSON * &  current)
 	String key;
 	for (i; i < args.count(); i++)
 	{
-		key = args[i].get_as_char_array();
+		key = args[i];
 		current = &current->get(key);
 	}
 	cout << "selected ";
@@ -127,6 +128,7 @@ void commands::Save::execute(JSON * &  parsed_json, JSON * &  current)
 		throw;
 	}
 	out.close();
+	cout << "saved to " << args[0];
 }
 
 void commands::Update::execute(JSON * &  parsed_json, JSON * &  current)
@@ -150,7 +152,8 @@ void commands::Update::execute(JSON * &  parsed_json, JSON * &  current)
 		throw;
 	}
 	delete value;
-
+	cout << "updated " << key << " to ";
+	value->print(cout, false, 0);
 }
 
 void commands::Swap::execute(JSON * &  parsed_json, JSON * &  current)
@@ -183,12 +186,75 @@ void commands::Equal::execute(JSON * &  parsed_json, JSON * &  current)
 
 void commands::Find::execute(JSON * &  parsed_json, JSON * &  current)
 {
-	throw json_exception("Find command not implemented");
+	Vector<cstring> args = this->read_args(" ");
+	if (!current)
+	{
+		cout << "Select an object first";
+		return;
+	}
+	if (args.count() == 0)
+	{
+		cout << "invalid arguments";
+		return;
+	}
+	if (args[0] == "--clear")
+	{
+		this->arr.clear();
+		cout << "array cleared";
+		return;
+	}
+	if (args[0] == "--print")
+	{
+		arr.print(cout, true, 0);
+		return;
+	}
+	if (args[0] == "--save")
+	{
+		std::ofstream out;
+		if (args[2] == "--override-file")
+		{
+			out.open(args[1].get_as_char_array());
+		}
+		else
+		{
+			out.open(args[1].get_as_char_array(), std::ios::app);
+		}
+		if (!out)
+		{
+			cout << "could not open " << args[1];
+			out.close();
+			return;
+		}
+		arr.print(out, args[3] == "--pretty", 0);
+		out.close();
+		return;
+	}
+	if (current->tell_type() == "Composite")
+	{
+		const Composite * casted = dynamic_cast<const Composite*>(current);
+		this->search(args, casted);
+	}
 }
 
-void commands::Find::search(Vector<cstring>& keys_to_search)
+void commands::Find::search(Vector<cstring>& keys_to_search, const Composite * & json)
 {
-	throw json_exception("Not implemented");
+	for (size_t i = 0; i < json->count(); i++)
+	{
+		if (json->get_values()[i]->tell_type() == "Composite")
+		{
+			const Composite * sub = dynamic_cast<const Composite *>(json->get_values()[i]);
+			this->search(keys_to_search, sub);
+		}
+	}
+	for (size_t i = 0; i < keys_to_search.count(); i++)
+	{
+		String key(keys_to_search[i]);
+		int index_of = json->get_keys().index_of(key);
+		if (index_of != -1)
+		{
+			this->arr.add(*json->get_values()[index_of]);
+		}
+	}
 }
 
 void commands::Add::execute(JSON *& parsed_json, JSON *& current)

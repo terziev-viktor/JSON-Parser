@@ -14,6 +14,7 @@ namespace tools
 		~cstring();
 		unsigned int get_length() const;
 		unsigned int get_capacity() const;
+		void set_capacity(unsigned int length);
 		const char * get_as_char_array() const;
 		cstring substring(unsigned int from, unsigned int to) const;
 		int find_first_of(const cstring & characters, unsigned int start_from = 0) const;

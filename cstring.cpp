@@ -4,13 +4,13 @@
 #include <stdexcept>
 #include <iostream>
 using namespace tools;
-cstring::cstring():length(0),capacity(1),value(nullptr)
+cstring::cstring() :length(0), capacity(1), value(nullptr)
 {
 	this->value = new char[this->capacity];
 	this->value[0] = '\0';
 }
 
-cstring::cstring(unsigned int length):length(0),capacity(length + 1)
+cstring::cstring(unsigned int length) :length(0), capacity(length + 1), value(nullptr)
 {
 	this->value = new char[this->capacity];
 	this->value[0] = '\0';
@@ -46,6 +46,24 @@ unsigned int cstring::get_length() const
 unsigned int tools::cstring::get_capacity() const
 {
 	return this->capacity;
+}
+
+void tools::cstring::set_capacity(unsigned int length)
+{
+	if (!value)
+	{
+		this->value = new char[this->capacity];
+		this->value[0] = '\0';
+	}
+	this->capacity = length + 1;
+	char * buffer = new char[this->capacity];
+	unsigned int min = this->get_length() < length ? this->get_length() : length;
+	for (unsigned int i = 0; i <= min; i++)
+	{
+		buffer[i] = this->value[i];
+	}
+	delete[] this->value;
+	this->value = buffer;
 }
 
 const char * tools::cstring::get_as_char_array() const
@@ -293,7 +311,7 @@ std::istream & tools::operator>>(std::istream & in, cstring & obj)
 	short i = 0;
 	char c;
 	in.get(c);
-	while(c != ' ' && c != '\n' && c != '\t')
+	while (c != ' ' && c != '\n' && c != '\t')
 	{
 		buffer[i++] = c;
 		in.get(c);
