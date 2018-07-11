@@ -12,8 +12,6 @@ namespace interpreters
 	class JSONParser
 	{
 	public:
-		// Parses the string to json
-		// Returns true on at least one successful parsing
 		static Component * parse(const cstring & json);
 		static Array * parse_json_array(const cstring & json);
 		static Composite * parse_json(const cstring & json);

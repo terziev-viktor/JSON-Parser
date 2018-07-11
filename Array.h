@@ -9,7 +9,11 @@ namespace components
 	public:
 		~Array();
 		void add(const Component&);
-		
+		unsigned int count() const;
+		void clear();
+		bool is_empty() const;
+		int index_of(const Component & other) const;
+
 		Array & operator=(const Array & other);
 		Array & operator+=(const Array & other);
 		Array & operator-=(unsigned int index);
@@ -17,19 +21,14 @@ namespace components
 		bool operator!=(const Array & other) const;
 		Component & operator[](unsigned int index);
 		const Component & operator[](unsigned int index) const;
+
 		/*override JSON*/
 		JSON & get(const String & index);
 		const JSON & get(const String & index) const;
-
 		void update(const String&, const Component & new_value);
 		void remove(const String&);
 		void swap(const String& str1, const String& str2);
 		void components::Array::add(unsigned int items_count, ...);
-
-		unsigned int count() const;
-		void clear();
-		bool is_empty() const;
-		int index_of(const Component & other) const;
 
 		/*override component*/
 		Component * copy() const;

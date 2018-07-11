@@ -1,6 +1,9 @@
 #include "Commands.h"
 using namespace commands;
 #include "JSONParser.h"
+#include "Boolean.h"
+#include "Number.h"
+using namespace components;
 using std::cout;
 using std::cin;
 using std::endl;
@@ -72,6 +75,25 @@ void run_demo()
 
 int main()
 {
+	Composite json;
+	json.add("debug", Boolean(true));
+	json.add("args", Array());
+	json.add("settings", Composite());
+	json.add("title", String("json-parser"));
+	json.add("PI", Number(3.14));
+	
+	json.update("title", String("super-json"));
+	json.remove("PI");
+
+	auto & settings = json.get("settings");
+	settings.add(2, "width", "33.33", "height", "50.3");
+	
+	auto & args = json.get("args");
+	args.add(3, "[1,2,3]", "3.14", "\"3.14\"");
+
+	json.print(cout, true, 0);
+	cout << endl;
+	
 	run_demo();
 	return 0;
 }

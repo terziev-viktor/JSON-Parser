@@ -15,7 +15,11 @@ namespace components
 		const PointerContainer<Component> & get_values() const;
 		
 		void add(const String & key, const Component & value);
-		
+		unsigned int count() const;
+		int index_of(const Component & item) const;
+		bool is_empty() const;
+		void clear();
+
 		/*override JSON*/
 		JSON & get(const String & index);
 		const JSON & get(const String & index) const;
@@ -23,11 +27,6 @@ namespace components
 		void add(unsigned int key_value_pairs_count, ...);
 		void remove(const String & key);
 		void update(const String & key, const Component & new_value);
-
-		unsigned int count() const;
-		int index_of(const Component & item) const;
-		bool is_empty() const;
-		void clear();
 
 		/*operators*/
 		bool operator==(const Composite & other) const;

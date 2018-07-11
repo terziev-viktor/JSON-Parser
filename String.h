@@ -11,6 +11,7 @@ namespace components
 	public:
 		String();
 		String(unsigned int number_of_characters_to_store);
+		String(const char * str);
 		String(const cstring & str);
 		const char * get_value() const;
 		unsigned int get_length() const;

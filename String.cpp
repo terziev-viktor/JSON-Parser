@@ -12,6 +12,11 @@ components::String::String(unsigned int capacity)
 	this->value.set_capacity(capacity);
 }
 
+components::String::String(const char * str)
+{
+	this->value = str;
+}
+
 components::String::String(const cstring & str)
 {
 	this->value = str;

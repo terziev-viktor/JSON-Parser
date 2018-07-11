@@ -158,7 +158,7 @@ const JSON & components::Composite::get(const String & key) const
 void components::Composite::remove(const String & key)
 {
 	int ind = this->keys.index_of(key);
-	if (ind = -1)
+	if (ind == -1)
 	{
 		throw invalid_key_name_exception(key.get_value());
 	}
