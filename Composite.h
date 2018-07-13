@@ -13,7 +13,8 @@ namespace components
 		~Composite();
 		const Vector<String> get_keys() const;
 		const PointerContainer<Component> & get_values() const;
-		
+		operator bool() const;
+		bool operator!() const;
 		void add(const String & key, const Component & value);
 		unsigned int count() const;
 		int index_of(const Component & item) const;

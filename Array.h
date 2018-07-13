@@ -21,7 +21,8 @@ namespace components
 		bool operator!=(const Array & other) const;
 		Component & operator[](unsigned int index);
 		const Component & operator[](unsigned int index) const;
-
+		operator bool() const;
+		bool operator!() const;
 		/*override JSON*/
 		JSON & get(const String & index);
 		const JSON & get(const String & index) const;

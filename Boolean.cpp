@@ -15,6 +15,16 @@ components::Boolean::Boolean(bool v)
 	this->value = v;
 }
 
+components::Boolean::operator bool() const
+{
+	this->value;
+}
+
+bool components::Boolean::operator!() const
+{
+	return !(bool)(*this);
+}
+
 bool components::Boolean::operator==(const Boolean & other) const
 {
 	return this->value == other.value;

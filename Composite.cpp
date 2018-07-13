@@ -70,6 +70,16 @@ const PointerContainer<Component> & components::Composite::get_values() const
 	return this->values;
 }
 
+components::Composite::operator bool() const
+{
+	return !this->is_empty();
+}
+
+bool components::Composite::operator!() const
+{
+	return !(bool)(*this);
+}
+
 void components::Composite::add(unsigned int key_value_pairs_count, ...)
 {
 	va_list args;

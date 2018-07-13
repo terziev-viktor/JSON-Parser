@@ -114,6 +114,16 @@ const Component & components::Array::operator[](unsigned int index) const
 	return *this->values[index];
 }
 
+components::Array::operator bool() const
+{
+	return !this->is_empty();
+}
+
+bool components::Array::operator!() const
+{
+	return !(bool)(*this);
+}
+
 JSON & components::Array::get(const String & str)
 {
 	int index;

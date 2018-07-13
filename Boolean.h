@@ -7,7 +7,8 @@ namespace components
 	public:
 		Boolean();
 		Boolean(bool v);
-
+		operator bool() const;
+		bool operator!() const;
 		bool operator==(const Boolean & other) const;
 		/*override*/
 		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
