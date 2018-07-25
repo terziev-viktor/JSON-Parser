@@ -6,18 +6,20 @@ using components::creators::BooleanCreator;
 static const BooleanCreator theBooleanCreator;
 
 components::Boolean::Boolean()
-	:value(false)
+	:Component("Boolean")
 {
+	this->value = false;
 }
 
 components::Boolean::Boolean(bool v)
+	:Component("Boolean")
 {
 	this->value = v;
 }
 
 components::Boolean::operator bool() const
 {
-	this->value;
+	return this->value;
 }
 
 bool components::Boolean::operator!() const
@@ -58,11 +60,6 @@ bool components::Boolean::equals(const Component & other) const
 	{
 		return false;
 	}
-}
-
-cstring components::Boolean::tell_type() const
-{
-	return "Boolean";
 }
 
 Component * components::creators::BooleanCreator::createComponent(TokensSimulator & tokens, unsigned int & line) const

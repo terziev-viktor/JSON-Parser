@@ -14,7 +14,6 @@ namespace components
 		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
 		Component * copy() const;
 		bool equals(const Component & other) const;
-		cstring tell_type() const;
 	private:
 		bool value;
 	};

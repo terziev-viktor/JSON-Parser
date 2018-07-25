@@ -6,6 +6,8 @@ namespace components
 	class JSON : public Component
 	{
 	public:
+		JSON(const cstring & t);
+
 		virtual ~JSON() = default;
 
 		virtual JSON & get(const String & index) = 0;

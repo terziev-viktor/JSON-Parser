@@ -6,17 +6,19 @@ using components::Number;
 const double Number::EPS = 1e-15;
 static const components::creators::NumberCreator theNumberCreator;
 
-Number::Number():value(0.0)
+Number::Number():Component("Number"),value(0.0)
 {
 
 }
 
 components::Number::Number(const cstring & other)
+	:Component("Number")
 {
 	this->set_value(other);
 }
 
 components::Number::Number(const double v)
+	:Component("Number")
 {
 	this->set_value(v);
 }
@@ -142,11 +144,6 @@ void components::Number::print(std::ostream & out, bool pretty, unsigned int tab
 bool components::Number::equals(const Component & other) const
 {
 	return false;
-}
-
-cstring components::Number::tell_type() const
-{
-	return "Number";
 }
 
 Number components::operator+(const Number & a, const Number & b)

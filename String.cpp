@@ -3,21 +3,25 @@
 static const components::creators::StringCreator theStringCreator;
 
 components::String::String()
+	:Component("String")
 {
 
 }
 
 components::String::String(unsigned int capacity)
+	:Component("String")
 {
 	this->value.set_capacity(capacity);
 }
 
 components::String::String(const char * str)
+	:Component("String")
 {
 	this->value = str;
 }
 
 components::String::String(const cstring & str)
+	:Component("String")
 {
 	this->value = str;
 }
@@ -108,11 +112,6 @@ char components::String::operator[](unsigned int index) const
 char & components::String::operator[](unsigned int index)
 {
 	return this->value[index];
-}
-
-cstring components::String::tell_type() const
-{
-	return "String";
 }
 
 components::String components::operator+(const String & a, const String & b)

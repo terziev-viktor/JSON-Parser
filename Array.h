@@ -7,6 +7,7 @@ namespace components
 	class Array : public JSON
 	{
 	public:
+		Array();
 		~Array();
 		void add(const Component&);
 		unsigned int count() const;
@@ -35,7 +36,6 @@ namespace components
 		Component * copy() const;
 		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
 		bool equals(const Component & other) const;
-		cstring tell_type() const;
 	private:
 		PointerContainer<Component> values;
 	};

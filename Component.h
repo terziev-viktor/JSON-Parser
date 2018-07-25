@@ -12,6 +12,8 @@ namespace components
 	class Component
 	{
 	public:
+		Component(const cstring & type);
+
 		virtual ~Component() = default;
 		// Print on a given output stream <out>
 		// <tab_index> is used to print the object in a pretty way
@@ -22,7 +24,9 @@ namespace components
 
 		virtual bool equals(const Component & other) const = 0;
 
-		virtual cstring tell_type() const = 0;
+		cstring tell_type() const;
+	private:
+		cstring type;
 	};
 	namespace creators
 	{

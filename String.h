@@ -23,7 +23,6 @@ namespace components
 		void print(std::ostream & out, bool pretty, unsigned int tab_index) const;
 		bool equals(const Component & other) const;
 		Component * copy() const;
-		cstring tell_type() const;
 		// Operators
 		String & operator+=(const String & other);
 		String & operator+=(const char ch);

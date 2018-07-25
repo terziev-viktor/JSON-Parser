@@ -10,6 +10,7 @@ namespace components
     class Composite : public JSON
     {
     public:
+		Composite();
 		~Composite();
 		const Vector<String> get_keys() const;
 		const PointerContainer<Component> & get_values() const;

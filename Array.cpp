@@ -12,6 +12,11 @@ using creators::ArrayCreator;
 
 static const creators::ArrayCreator theArrayCreator;
 
+components::Array::Array()
+	:JSON("Array")
+{
+}
+
 components::Array::~Array()
 {
 	this->values.delete_all_content();
@@ -244,11 +249,6 @@ void components::Array::print(std::ostream & out, bool pretty, unsigned int tab_
 bool components::Array::equals(const Component & other) const
 {
 	return false;
-}
-
-cstring components::Array::tell_type() const
-{
-	return "Array";
 }
 
 Component * components::creators::ArrayCreator::createComponent(TokensSimulator & tokens, unsigned int & line_number) const

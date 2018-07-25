@@ -55,6 +55,11 @@ void components::Composite::print(std::ostream & out, bool pretty, unsigned int 
 	out << '}';
 }
 
+components::Composite::Composite()
+	:JSON("Composite")
+{
+}
+
 components::Composite::~Composite()
 {
 	this->values.delete_all_content();
